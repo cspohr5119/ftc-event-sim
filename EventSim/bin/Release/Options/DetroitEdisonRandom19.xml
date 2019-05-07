@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+These options will run an event with teams from an actual event, but schedule them
+randomly and assign OPR values as scores.  This is helpful when comparing Random vs Swiss outcomes.
+Ranking should be similarly problematic as actual results, but will vary due to different random matchups.
+-->
+
+<!-- 
+  EventKey is found in the URL for the event at https://theorangealliance.org
+  Supported SchedulingModel values are "SwissScheduling", "RandomScheduling"
+  Supported TBPMethod values are "LosingScore", "WinningScore", "OwnScore", "TotalScore"
+  ScoreRandomness is a value beteen 0 and 1.  This will give a random component to teams 
+  score where score = OPR +/- (OPR * ScoreRandomness).
+-->
+<Options 
+  EventKey="1819-CMP-DET1"
+  SchedulingModel="RandomScheduling" 
+  DataFilesFolder="DataFiles"
+  TBPMethod="LosingScore" 
+  ScoreRandomness="0.2" 
+  Rounds="9" 
+  Trials="1">
+  <RandomScheduling 
+    UseFTCSchdule="true" 
+    UseFTCResults="false" 
+  />
+
+  <!-- 
+    Supported PairingMethod values are "Slide", "Fold"
+  -->
+  <SwissScheduling 
+    SeedFirstRoundsOPR="false" 
+    RoundsToScheduleAtStart="1" 
+    SchduleAtBreaks="false" 
+    BreaksAfter="2,7" 
+    OpponentPairingMethod="Fold" 
+    AllianceParingMethod="Slide" 
+    CostForPreviousOppoent="100" 
+    CostForPreviousAlignment="10" 
+    CostForCrossingGroups="10" 
+  />
+
+  <!--
+    Specify messages to include in output.  Helpful if capturing specific raw data to a file.
+  -->
+  <Output 
+    Status="true" 
+    Headings="true" 
+    Matchups="true" 
+    IncludeCurrentRank="true" 
+    RankingsAfterEachRound="false" 
+    FinalRankings="true" 
+    TopXStats="6" 
+    TrialStats="true" 
+    BatchStats="true" 
+  />
+</Options>

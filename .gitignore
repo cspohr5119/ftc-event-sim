@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs
+/EventSim/obj
+/EventSim/EventSim.csproj.user
+/FTCData/obj
+/Matching/obj
+/OPR/obj
