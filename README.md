@@ -99,7 +99,7 @@ I get to it.
 
 ## Options
 ~~~~
-  EventKey="1819-CMP-DET   // The event key from theorangealliance.org, found in the event URL.
+  EventKey="1819-CMP-DET"  // The event key from theorangealliance.org, found in the event URL.
   SchedulingModel="SwissScheduling"  // Supported values are "SwissScheduling", "RandomScheduling"
   TBPMethod="LosingScore"  // Supported values are "LosingScore", "WinningScore", "OwnScore", "TotalScore"
   ScoreRandomness="0.1"    // Value beteen 0 and 1 and will make score = OPR +/- (OPR * ScoreRandomness)
