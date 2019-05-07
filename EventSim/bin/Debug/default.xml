@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
 These are the default options, and will be used if no options file is specified
-on the command line.  It will run 1 event with 1 random round followed by 4 Swiss rounds.
+on the command line.  It will run 1 event with 1 random round followed by 8 Swiss rounds.
 -->
 
 <!-- 
@@ -16,8 +16,8 @@ on the command line.  It will run 1 event with 1 random round followed by 4 Swis
   DataFilesFolder="DataFiles"
   SchedulingModel="SwissScheduling" 
   TBPMethod="LosingScore" 
-  ScoreRandomness="0" 
-  Rounds="5" 
+  ScoreRandomness="0.2" 
+  Rounds="9" 
   Trials="1">
   <RandomScheduling 
     UseFTCSchdule="true" 
