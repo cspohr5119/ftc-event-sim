@@ -166,7 +166,7 @@ namespace FTCData
             }
 
             // create edges across groups with increased cost
-            int crossGroupAdder = teams.Count + 10;
+            int crossGroupAdder = teams.Count + _options.SwissScheduling.CostForCrossingGroups;
             edges.AddRange(CreateEdgesBetweenNeighboringGroups(groups, crossGroupAdder));
 
             // add cost for teams that have opposed each other already
@@ -192,7 +192,7 @@ namespace FTCData
             }
 
             // create edges across groups with increased cost
-            crossGroupAdder = teams.Count + 10;
+            crossGroupAdder = teams.Count + _options.SwissScheduling.CostForCrossingGroups;
             edges.AddRange(CreateEdgesBetweenNeighboringGroups(groups, crossGroupAdder));
 
             // add cost for teams that have aligned together already
@@ -385,20 +385,22 @@ namespace FTCData
         {
             // Check existing edges and increase the cost if two teams have opposed each other before.
             // Note:  
-            //  Each node is a 1v1 matchup, therefore opponents.  This means:
-            //   Node1.Team is opposing both Node1.Team2 and Node2.Team2 amd
-            //   Node2.Team is opposing both Node1.Team and Node2.Team.
-            //  We only need to check for opponents between nodes, though, because we
+            //  Each node is either a 1v1 matchup or a 2v2 matchup.   This means:
+            //   Node1.Team is opposing both Node1.Team2, Node2.Team and Node2.Team2
+            //   Node2.Team is opposing both Node1.Team, Node1.Team, and Node2.Team2
+            //  For pairs, we only need to check for opponents between nodes, though, because we
             //  already optimized for intra-node opponents during 1v1 pairing and that
             //  has no bearing when trying to match 1v1 nodes to other 1v1 nodes for a match lineup.
 
             foreach (var edge in edges)
             {
+                // applies for 1v1 and 2v2
                 if (edge.Node1.Team.HasOpposed.ContainsKey(edge.Node2.Team.Number))
                 {
                     edge.Cost += costAdder;
                 }
 
+                // 2v2 only
                 if (edge.Node1.Team2 != null) // this is a node of pairs  (doesn't apply for 1v1 pairing)
                 {
                     if (edge.Node1.Team.HasOpposed.ContainsKey(edge.Node2.Team2.Number))
