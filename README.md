@@ -1,7 +1,7 @@
 # ftc-event-sim
 A simulator to experiment with different FTC scheduling and ranking methods.
 
-Author: Chuck Spohr, Team 5119 Baryons Mentor
+Author: Chuck Spohr, Team 5119 Baryons Mentor<br/>
 Contact: chuckspohr@gmail.com
 
 This project is a C# .NET console app developed in Visual Studio 2019 Community Edition and 
@@ -9,7 +9,7 @@ requires the Microsoft .NET framework 4.7.2.
 
 ## Summary
 This is an FTC event simulator.  It will "re-run" a past FTC tournament's qualifying rounds
-under different scheduling systems and Tie-breaker point (TBP) rules that you configure.
+under different scheduling systems and Tie-Breaker Point (TBP) rules that you configure.
 It reads team and match data from theorangealliance.org, then replays the tournament 
 (qualifying rounds only) per your specification.
 
@@ -18,7 +18,8 @@ You can do that too.
 
 If you think random scheduling really wrecks RP for a lot of teams (it does), how can you
 prove it?  Run the actual tournament with actual scores, then compare it to the same
-tournament scheduled by the Swiss tournament system.  Check out the difference.
+tournament scheduled by the [Swiss tournament system](https://en.wikipedia.org/wiki/Swiss-system_tournament).
+Check out the difference.
 
 How do you see if your new system improves things?  It's easy.  Final rankings are shown
 along with OPR rank.  I think most people would agree that the top teams in OPR should
@@ -29,7 +30,7 @@ of variance is also given, which indicates the average difference between OPR Ra
 Let's see how low we can get THAT value.
 
 ## Running EventSim.exe
-If you simply wish to run the binaries, copy the files from the *EventSim\bin\debug* folder 
+If you simply wish to run the binaries, copy the files from the **EventSim\bin\debug** folder 
 to a more convenient place, and run from the command line:
 
     EventSim.exe [optionsFile] 
@@ -47,7 +48,7 @@ I recommend making copies of the example options files for experimentation.  The
 known good configurations and are helpful for reference.
 
 Note: If you are creating and testing new options files in the Visual Studio debugger, set the 
-*Copy To Output Directory* property to *Copy always* or *Copy if newer* so that it will deploy
+**Copy To Output Directory** property to **Copy always** or **Copy if newer** so that it will deploy
 with the compiled code to the bin\debug folder.
 
     EventSim.exe Options\DetroitEdisonActual19.xml
@@ -133,14 +134,14 @@ I get to it.
 ~~~~
 
 ## Stats
-The ranking table includes each team's OPR value as found on TOA.  OPR is not calculated on the fly.
-It must be known up-front in order to caclulate scores for theoretical matchups.
+The ranking table includes each team's OPR values as calculated from actual match scores download
+from TOA.  OPR is used to caclulate scores for theoretical matchups.
 
 OPRRank is also shown for each team in the rankings. This is what the team's ranking would be if
 ranking were solely on OPR.  
 
-Variance is how many places "off" the actual rank is. -2 means a team ended with a rank two places
-below where they would have been if ranked by OPR.
+Variance is how many places "off" the actual rank is. -8 means a team ended with a rank 8 places
+below (or worse than) where they would have been if ranked by OPR.
 
 The stats section includes:
 
