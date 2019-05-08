@@ -41,7 +41,7 @@ folder.
 A file of matches is automatically downloaded and saved locally when you provide an event
 key from theorangealliance.org.  To find an event key, visit https://theorangealliance.org and
 navigate to the event of interest.  The event key is in the url.  For examle, navigating to the
-Missouri State Championship, T Division, the url is https://theorangealliance.org/events/1819-CMP-DET1 
+Detroit World Championship Edison Division, the url is https://theorangealliance.org/events/1819-CMP-DET1 
 so the event key is 1819-CMP-DET1.
 
 I recommend making copies of the example options files for experimentation.  The examples will run
