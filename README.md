@@ -116,7 +116,7 @@ I get to it.
     SchduleAtBreaks="false"       // Not yet supported 
     BreaksAfter="2,7"             // Not yet suppored
     OpponentPairingMethod="Fold"  // Method to find ideal opponents: "Fold" or "Slide"
-    AllianceParingMethod="Slide"  // Method to find ideal partners: "Fold" or "Slide"
+    AlliancePairingMethod="Slide" // Method to find ideal partners: "Fold" or "Slide"
     CostForPreviousOppoent="100"  // Cost penalty for same opponent twice
     CostForPreviousAlignment="10" // Cost penalty for same alliance twice 
     CostForCrossingGroups="10"    // Cost penalty for opponents in different RP groups

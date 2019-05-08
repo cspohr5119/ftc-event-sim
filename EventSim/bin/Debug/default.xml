@@ -33,7 +33,7 @@ on the command line.  It will run 1 event with 1 random round followed by 8 Swis
     SchduleAtBreaks="false" 
     BreaksAfter="2,7" 
     OpponentPairingMethod="Fold" 
-    AllianceParingMethod="Slide" 
+    AlliancePairingMethod="Slide" 
     CostForPreviousOppoent="100" 
     CostForPreviousAlignment="10" 
     CostForCrossingGroups="10" 

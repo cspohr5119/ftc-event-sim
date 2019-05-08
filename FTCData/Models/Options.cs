@@ -44,7 +44,7 @@ namespace FTCData.Models
             [XmlAttribute]
             public string OpponentPairingMethod = "Fold";   // "Fold" or "Slide"
             [XmlAttribute]
-            public string AllianceParingMethod = "Slide";   // "Fold" or "Slide"
+            public string AlliancePairingMethod = "Slide";  // "Fold" or "Slide"
             [XmlAttribute]
             public int CostForPreviousOppoent = 100;        // All costs are multiplied by number of teams
             [XmlAttribute]

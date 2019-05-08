@@ -33,7 +33,7 @@ Rankings should be the same as the offical rankings
     SchduleAtBreaks="false" 
     BreaksAfter="2,7" 
     OpponentPairingMethod="Fold" 
-    AllianceParingMethod="Slide" 
+    AlliancePairingMethod="Slide" 
     CostForPreviousOppoent="100" 
     CostForPreviousAlignment="10" 
     CostForCrossingGroups="10" 

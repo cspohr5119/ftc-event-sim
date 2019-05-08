@@ -162,7 +162,7 @@ namespace FTCData
             var edges = new List<Edge>();
             foreach (var group in groups)
             {
-                edges.AddRange(CreateEdgesForGroup(group));
+                edges.AddRange(CreateEdgesForGroup(group, _options.SwissScheduling.OpponentPairingMethod));
             }
 
             // create edges across groups with increased cost
@@ -181,29 +181,21 @@ namespace FTCData
             // create a node for each 1v1
             nodeList = CreateNodesFromPairs(pairs);
 
-            // create groups based on rankings of top team
-            groups = CreateGroups(nodeList);
+            // create 1 groups, ordered by rank.
+            var pairGroup = Create1Group(nodeList);
 
-            // create edges between pairs, by group
-            edges = new List<Edge>();
-            foreach (var group in groups)
-            {
-                edges.AddRange(CreateEdgesForGroup(group));
-            }
-
-            // create edges across groups with increased cost
-            crossGroupAdder = teams.Count + _options.SwissScheduling.CostForCrossingGroups;
-            edges.AddRange(CreateEdgesBetweenNeighboringGroups(groups, crossGroupAdder));
+            // match these nodes by specified algorithm
+            var pairEdges = CreateEdgesForGroup(pairGroup[0], _options.SwissScheduling.AlliancePairingMethod);
 
             // add cost for teams that have aligned together already
             int alignmentAdder = teams.Count * 10;
-            AddCostForPriorAlignment(edges, alignmentAdder);
+            AddCostForPriorAlignment(pairEdges, alignmentAdder);
 
             // add cost for teams that have opposed each other already
-            AddCostForPriorOpponenets(edges, oppositionAdder);
+            AddCostForPriorOpponenets(pairEdges, oppositionAdder);
 
             // Get paired matchup
-            var pairMatchups = GetPairMatchups(nodeList, edges); // return Tuple<Tuple<Team, Team>, Tuple<Team, Team>>
+            var pairMatchups = GetPairMatchups(nodeList, pairEdges); // return Tuple<Tuple<Team, Team>, Tuple<Team, Team>>
 
             // Build and add matches to schedule
             Console.WriteLine("Matchups for Round " + round);
@@ -285,7 +277,19 @@ namespace FTCData
             return groups;
         }
 
-        public IList<Edge> CreateEdgesForGroup(IList<Node> nodeList)
+        public IList<List<Node>> Create1Group(IList<Node> nodes)
+        {
+            // split node list into 2 groups of the same size, ordered by rank
+            var groups = new List<List<Node>>();
+
+            var group = nodes.OrderBy(n => n.Team.Rank).ToList();
+            groups.Add(group);
+
+            return groups;
+        }
+
+
+        public IList<Edge> CreateEdgesForGroup(IList<Node> nodeList, string pairingMethod)
         {
             // expect nodeList to already be sorted in rank order
             var group = nodeList.ToList();
@@ -340,7 +344,7 @@ namespace FTCData
             {
                 // first, figure out where the ideal column is.  (may be greater than the group size)
                 int ideal;  
-                if (_options.SwissScheduling.OpponentPairingMethod == "Fold")
+                if (pairingMethod == "Fold")
                     ideal = groupSize - node1Idx - 1;
                 else // slide
                     ideal = (groupSize / 2)  + node1Idx;

@@ -17,9 +17,9 @@ Ranking should be similarly problematic as actual results, but will vary due to 
   DataFilesFolder="DataFiles"
   SchedulingModel="SwissScheduling" 
   TBPMethod="LosingScore" 
-  ScoreRandomness="0.2" 
+  ScoreRandomness="0" 
   Rounds="9" 
-  Trials="1">
+  Trials="20">
   <RandomScheduling 
     UseFTCSchdule="true" 
     UseFTCResults="false" 
@@ -34,7 +34,7 @@ Ranking should be similarly problematic as actual results, but will vary due to 
     SchduleAtBreaks="false" 
     BreaksAfter="2,7" 
     OpponentPairingMethod="Fold" 
-    AllianceParingMethod="Slide" 
+    AlliancePairingMethod="Slide" 
     CostForPreviousOppoent="100" 
     CostForPreviousAlignment="10" 
     CostForCrossingGroups="10" 
