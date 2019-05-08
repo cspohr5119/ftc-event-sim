@@ -19,7 +19,7 @@ Ranking should be similarly problematic as actual results, but will vary due to 
   TBPMethod="LosingScore" 
   ScoreRandomness="0" 
   Rounds="9" 
-  Trials="20">
+  Trials="1">
   <RandomScheduling 
     UseFTCSchdule="true" 
     UseFTCResults="false" 

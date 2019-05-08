@@ -198,8 +198,6 @@ namespace FTCData
             var pairMatchups = GetPairMatchups(nodeList, pairEdges); // return Tuple<Tuple<Team, Team>, Tuple<Team, Team>>
 
             // Build and add matches to schedule
-            Console.WriteLine("Matchups for Round " + round);
-
             int matchesPerRound = teams.Count / 4;
             int matchNumber = matches.Count + 2;
 
