@@ -155,6 +155,8 @@ InTopX is the number of TopX teams in OPR who made it into the TopXRank.  For ex
 how many of the top 6 OPR teams made it into the Top 6 ranks?
 
 ## Change Log
-5/9/2019 Added options for Title and whether or not to output the title
+5/9/2019 Added options for Title and whether or not to output the title.
+
 5/9/2019 Added ability to override one or more options from the command line.  For example, 
-''''EventSim.exe Options\myoptions.xml Title="My Tournament" Trials=100 Output.Headers=false''''
+    
+    EventSim.exe Options\myoptions.xml Title="My Tournament" Trials=100 Output.Headers=false
