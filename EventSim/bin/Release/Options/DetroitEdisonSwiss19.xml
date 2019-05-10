@@ -13,6 +13,7 @@ Ranking should be similarly problematic as actual results, but will vary due to 
   score where score = OPR +/- (OPR * ScoreRandomness).
 -->
 <Options 
+  Title="Detroit Edison 2019 Swiss"
   EventKey="1819-CMP-DET1"
   DataFilesFolder="DataFiles"
   SchedulingModel="SwissScheduling" 
@@ -44,6 +45,7 @@ Ranking should be similarly problematic as actual results, but will vary due to 
     Specify messages to include in output.  Helpful if capturing specific raw data to a file.
   -->
   <Output 
+    Title="true"
     Status="true" 
     Headings="true" 
     Matchups="true" 
