@@ -5,6 +5,8 @@ namespace FTCData.Models
     public class Options
     {
         [XmlAttribute]
+        public string Title = @"Internal Default Configuration"; // Descriptive title for this configuration.  
+        [XmlAttribute]
         public string EventKey = @"1819-CMP-DET1"; // EventKey from theorangealliance.org
         [XmlAttribute]
         public string DataFilesFolder = @"DataFiles"; // Relative path to the local folder where TOA files are
@@ -55,6 +57,8 @@ namespace FTCData.Models
 
         public class OutputOptions
         {
+            [XmlAttribute]
+            public bool Title = true;                  // Write what is currently happening
             [XmlAttribute]
             public bool Status = true;                  // Write what is currently happening
             [XmlAttribute]

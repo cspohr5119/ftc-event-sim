@@ -19,6 +19,9 @@ namespace EventSim
                 try
                 {
                     options = optionsRepo.GetOptionsFromFile(args[0]);
+                    if (args.Length > 1)
+                        optionsRepo.Override(options, args);
+
                     engine = new Engine(options);
                     engine.Output.WriteStatus("Loaded optionsFile " + args[0]);
                 }
@@ -48,6 +51,7 @@ namespace EventSim
                 }
             }
 
+            engine.Output.WriteTitle(options.Title);
             engine.RunTrials(options.Trials);
 
             if (Debugger.IsAttached)

@@ -25,6 +25,9 @@ namespace EventSim
             WriteLine(output, _options.Output.Headings);
         }
 
-
+        public void WriteTitle(string output)
+        {
+            WriteLine(output, _options.Output.Title);
+        }
     }
 }
