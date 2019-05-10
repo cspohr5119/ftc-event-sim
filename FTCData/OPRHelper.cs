@@ -8,12 +8,17 @@ namespace FTCData
 {
     public class OPRHelper
     {
+        private readonly Options _options;
+        private readonly OPRCalculator _oprCalculator = new OPRCalculator();
 
-        OPRCalculator _oprCalculator = new OPRCalculator();
+        public OPRHelper(Options options)
+        {
+            _options = options;
+        }
 
         public void SetTeamsOPR(IDictionary<int, Team> teams, IDictionary<int, Match> matches)
         {
-            double mmse = 0.0d;
+            double mmse = (double) _options.OPRmmse;
             int[] teamList = teams.Values.Select(t => t.Number).ToArray<int>();
             int teamsPerAlliance = 2;
             int[][][] teamsPlaying = CreateTeamsPlayingArray(matches);
@@ -67,8 +72,13 @@ namespace FTCData
 
                 if (match.RedScore + match.BlueScore >= 1)
                 {
-                    matchScores[0] = match.RedScore; // - match.RedPenaltyBonus;  (removed these to match TOA's OPR calculation!)
-                    matchScores[1] = match.BlueScore; // - match.BluePenaltyBonus;
+                    matchScores[0] = match.RedScore;
+                    matchScores[1] = match.BlueScore;
+                    if (_options.OPRExcludesPenaltyPoints)
+                    {
+                        matchScores[0] -= match.RedPenaltyBonus;
+                        matchScores[1] -= match.BluePenaltyBonus;
+                    }
                 }
                 else
                 {

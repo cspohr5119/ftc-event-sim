@@ -9,7 +9,7 @@ namespace FTCData.Models
         [XmlAttribute]
         public string EventKey = @"1819-CMP-DET1"; // EventKey from theorangealliance.org
         [XmlAttribute]
-        public string DataFilesFolder = @"DataFiles"; // Relative path to the local folder where TOA files are
+        public string DataFilesFolder = @"DataFiles"; // Relative path to the local folder where TOA files are.
         [XmlAttribute]
         public string SchedulingModel = "SwissSchduling";  // "RandomScheduling" or "SwissScheduling"
         [XmlAttribute]
@@ -17,9 +17,13 @@ namespace FTCData.Models
         [XmlAttribute]
         public decimal ScoreRandomness = 0;        // 0.0 - 1.0.  Alliance Score = OPR +/- (ScoreRandomness * OPR)
         [XmlAttribute]
-        public int Rounds = 9;  // How many rounds to schedule in a tournament
+        public int Rounds = 9;  // How many rounds to schedule in a tournament.
         [XmlAttribute]
         public int Trials = 1;  // How many tournaments to run as a batch.  Good for getting long-term averages.
+        [XmlAttribute]
+        public bool OPRExcludesPenaltyPoints = true;  // Removes penalty points from OPR calculation.
+        [XmlAttribute]
+        public decimal OPRmmse = 1;  // Minimum Mean Square Error: 1 - 3 recommended, 0 for traditional OPR values.
 
         public RandomSchedulingOptions RandomScheduling = new RandomSchedulingOptions();
         public SwissSchedulingOptions SwissScheduling = new SwissSchedulingOptions();

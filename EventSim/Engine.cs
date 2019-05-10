@@ -208,7 +208,7 @@ namespace EventSim
         public void SetTeamsOPR(IDictionary<int, Team> teams, IDictionary<int, Match> matches)
         {
             _output.WriteStatus("Caculating team OPR from results file");
-            var oprCalculator = new OPRHelper();
+            var oprCalculator = new OPRHelper(_options);
             oprCalculator.SetTeamsOPR(teams, matches);
         }
 

@@ -1,4 +1,4 @@
-# ftc-event-sim
+# FTC EventSim
 A simulator to experiment with different FTC scheduling and ranking methods.
 
 Author: Chuck Spohr, Team 5119 Baryons Mentor<br/>
@@ -99,13 +99,16 @@ I get to it.
 
 ## Options
 ~~~~
+  Title="My Tournament"    // Title message added to beginning of output
   EventKey="1819-CMP-DET"  // The event key from theorangealliance.org, found in the event URL.
   SchedulingModel="SwissScheduling"  // Supported values are "SwissScheduling", "RandomScheduling"
   TBPMethod="LosingScore"  // Supported values are "LosingScore", "WinningScore", "OwnScore", "TotalScore"
   ScoreRandomness="0.1"    // Value beteen 0 and 1 and will make score = OPR +/- (OPR * ScoreRandomness)
   Rounds="5"               // How many times each team will play in the tournament.
   Trials="1"               // Will run the same simulation n-times and will aggregate the stats
-  
+  OPRExcludesPenaltyPoints="false"  // If true, will deduct penalty points for OPR calculation
+  OPRmmse="0"              // Minimum Mean Square Error: 1 - 3 recommended, 0 for traditional OPR values.
+    
   RandomScheduling 
     UseFTCSchdule="true"   // If true, schedule the matches as they actually happened 
     UseFTCResults="false"  // If true, use actual match scores, otherwise, based on OPR 
@@ -131,6 +134,7 @@ I get to it.
     TopXStats="6"                   // Number of teams in TopX stats.
     TrialStats="true"               // Stats for each event
     BatchStats="true"               // Aggregated stats (for multiple trials in a batch)
+    Title="true"                    // Show title
 ~~~~
 
 ## Stats
@@ -155,8 +159,11 @@ InTopX is the number of TopX teams in OPR who made it into the TopXRank.  For ex
 how many of the top 6 OPR teams made it into the Top 6 ranks?
 
 ## Change Log
+5/9/2019 Added OPR calculation options: OPRExcludesPenaltyPoints and OPRmmse.
+
 5/9/2019 Added options for Title and whether or not to output the title.
 
 5/9/2019 Added ability to override one or more options from the command line.  For example, 
     
     EventSim.exe Options\myoptions.xml Title="My Tournament" Trials=100 Output.Headers=false
+ 

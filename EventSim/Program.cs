@@ -52,6 +52,8 @@ namespace EventSim
             }
 
             engine.Output.WriteTitle(options.Title);
+
+            // Run the simulation!
             engine.RunTrials(options.Trials);
 
             if (Debugger.IsAttached)

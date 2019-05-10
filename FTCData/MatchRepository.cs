@@ -116,7 +116,7 @@ namespace FTCData
 
         public void SetRankings(IDictionary<int, Match> matches, IDictionary<int, Team> teams, string tbpMethod)
         {
-            var oprCalculater = new OPRHelper();
+            var oprCalculater = new OPRHelper(_options);
 
             // clear team stats
             foreach (var item in teams)
