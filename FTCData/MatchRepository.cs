@@ -6,6 +6,7 @@ using System.Net;
 using System.IO;
 using System.Web.Script.Serialization;
 using System.Configuration;
+using NCalc;
 
 namespace FTCData
 {
@@ -204,6 +205,12 @@ namespace FTCData
                 losingPPScore = Math.Min(redPPScore, bluePPScore);
             }
 
+            int ownPPScore = 0;
+            if (isRed)
+                ownPPScore = redPPScore;
+            else
+                ownPPScore = bluePPScore;
+
             switch (_options.TBPMethod)
             {
                 case "LosingScore":
@@ -213,18 +220,29 @@ namespace FTCData
                     return winningPPScore;
 
                 case "OwnScore":
-                    if (isRed)
-                        return redPPScore;
-                    else
-                        return bluePPScore;
+                    return ownPPScore;
 
                 case "TotalScore":
                     return redPPScore + bluePPScore;
+
+                case "Expression":
+                    return EvaluateTBP(_options.TBPExpression, winningPPScore, losingPPScore, ownPPScore);
 
                 default:
                     throw new NotImplementedException(_options.TBPMethod + " is not a supported TBPMethod");
             }
         }
+
+        public int EvaluateTBP(string tbpExpression, int winningScore, int losingScore, int ownScore)
+        {
+            var expr = new Expression(tbpExpression);
+            expr.Parameters["WinningScore"] = winningScore;
+            expr.Parameters["LosingScore"] = losingScore;
+            expr.Parameters["OwnScore"] = ownScore;
+
+            return (int) Math.Round((double) expr.Evaluate());
+        }
+
         public void ClearTeamStats(Team team)
         {
             team.Played = 0;

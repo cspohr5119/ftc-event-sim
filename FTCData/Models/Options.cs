@@ -13,7 +13,10 @@ namespace FTCData.Models
         [XmlAttribute]
         public string SchedulingModel = "SwissSchduling";  // "RandomScheduling" or "SwissScheduling"
         [XmlAttribute]
-        public string TBPMethod = "LosingScore";          // "LosingScore", "WinningScore", "OwnScore", "TotalScore"
+        public string TBPMethod = "LosingScore";          // "LosingScore", "WinningScore", "OwnScore", "TotalScore", "Expression"
+        [XmlAttribute]
+        public string TBPExpression = "[OwnScore] + [LosingScore]"; // If TBPMethod is "Expresion", caluclate TBP with mathematical expresion 
+                                                                        // containing [LosingSocore], [WinningScore], and/or [OwnScore]
         [XmlAttribute]
         public decimal ScoreRandomness = 0;        // 0.0 - 1.0.  Alliance Score = OPR +/- (ScoreRandomness * OPR)
         [XmlAttribute]

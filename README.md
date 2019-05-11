@@ -102,7 +102,8 @@ I get to it.
   Title="My Tournament"    // Title message added to beginning of output
   EventKey="1819-CMP-DET"  // The event key from theorangealliance.org, found in the event URL.
   SchedulingModel="SwissScheduling"  // Supported values are "SwissScheduling", "RandomScheduling"
-  TBPMethod="LosingScore"  // Supported values are "LosingScore", "WinningScore", "OwnScore", "TotalScore"
+  TBPMethod="Expression"   // Supported values are "LosingScore", "WinningScore", "OwnScore", "TotalScore", "Expression"
+  TBPExpresson="[OwnScore] + [LosingScore]" // Custom expression to calculate TBP (if TBPMethod is "Expression")
   ScoreRandomness="0.1"    // Value beteen 0 and 1 and will make score = OPR +/- (OPR * ScoreRandomness)
   Rounds="5"               // How many times each team will play in the tournament.
   Trials="1"               // Will run the same simulation n-times and will aggregate the stats
@@ -159,6 +160,8 @@ InTopX is the number of TopX teams in OPR who made it into the TopXRank.  For ex
 how many of the top 6 OPR teams made it into the Top 6 ranks?
 
 ## Change Log
+5/10/2019 Added expression evaluator for TBP.
+
 5/9/2019 Added OPR calculation options: OPRExcludesPenaltyPoints and OPRmmse.
 
 5/9/2019 Added options for Title and whether or not to output the title.
