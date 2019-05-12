@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
-These options will run an actual schedule with actual results.
-Rankings should be the same as the offical rankings 
+These options will run an theoretical event with a provided list of teams and OPR values.
 -->
 
 <!-- 
@@ -18,28 +17,28 @@ Rankings should be the same as the offical rankings
     will be forced false.
 -->
 <Options 
-  Title="Detroit Edison 2019 Actual"
-  EventKey="1819-CMP-DET1"
+  Title="Houston Jemison 2018 Swiss Alternate TBP"
+  EventKey="1718-CMP-HOU2"
   TeamPPMFile=""
   DataFilesFolder="DataFiles"
-  SchedulingModel="RandomScheduling" 
-  TBPMethod="LosingScore" 
-  TBPExpression=""
-  ScoreRandomness="0" 
+  SchedulingModel="SwissScheduling" 
+  TBPMethod="Expression" 
+  TBPExpression="[LosingScore] + [OwnScore]"
+  ScoreRandomness="0"
   Rounds="9" 
   Trials="1"
-  OPRExcludesPenaltyPoints="false"
+  OPRExcludesPenaltyPoints="true"
   OPRmmse="0">
   <RandomScheduling 
-    UseFTCSchedule="true" 
-    UseFTCResults="true" 
+    UseFTCSchedule="false" 
+    UseFTCResults="false" 
   />
 
   <!-- 
     Supported PairingMethod values are "Slide", "Fold"
   -->
   <SwissScheduling 
-    SeedFirstRoundsOPR="false" 
+    SeedFirstRoundsOPR="true"
     RoundsToScheduleAtStart="1" 
     StartingRoundsOpponentPairingMethod="Slide"
     ScheduleAtBreaks="false" 
@@ -62,7 +61,7 @@ Rankings should be the same as the offical rankings
     IncludeCurrentRank="true" 
     RankingsAfterEachRound="false" 
     FinalRankings="true"
-    TopXStats="6" 
+    TopXStats="7" 
     TrialStats="true" 
     BatchStats="true" 
   />

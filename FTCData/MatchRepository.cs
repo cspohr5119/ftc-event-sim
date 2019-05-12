@@ -14,6 +14,7 @@ namespace FTCData
     {
         private readonly Options _options;
         private readonly Random _rnd = new Random();
+        private Expression _expr = null;
 
         public MatchRepository(Options options)
         {
@@ -92,7 +93,7 @@ namespace FTCData
             return response;
         }
 
-        public void SetMatchResultsFromOpr(IDictionary<int, Match> matches)
+        public void SetMatchResultsFromPPM(IDictionary<int, Match> matches)
         {
             foreach (var match in matches.Values.Where(m => m.Played == false))
             {
@@ -104,7 +105,7 @@ namespace FTCData
 
         public int CalculateAllianceScore(Team team1, Team team2)
         {
-            int score = (int)Math.Round(team1.OPR + team2.OPR, 0);
+            int score = (int)Math.Round(team1.PPM + team2.PPM, 0);
             if (_options.ScoreRandomness > 0.0m)
             { 
                 int scoreMin = score - (int)(score * _options.ScoreRandomness);
@@ -170,12 +171,24 @@ namespace FTCData
                 item.Value.Rank = rank++;
             }
 
-            // Set OPR Rank and Variance
+            // Set CurrentOPR
+            var _oprHelper = new OPRHelper(_options);
+            _oprHelper.SetTeamsOPR(teams, "CurrentOPR", matches);
+
+            // Set PPM Rank and Variance
             rank = 1;
-            foreach (var item in teams.OrderByDescending(t => t.Value.OPR))
+            foreach (var item in teams.OrderByDescending(t => t.Value.PPM))
+            {
+                item.Value.PPMRank = rank++;
+                item.Value.PPMRankDifference = item.Value.PPMRank - item.Value.Rank;
+            }
+
+            // Set CurrentOPR Rank and Variance
+            rank = 1;
+            foreach (var item in teams.OrderByDescending(t => t.Value.CurrentOPR))
             {
                 item.Value.OPRRank = rank++;
-                item.Value.RankVariance = item.Value.OPRRank - item.Value.Rank;
+                item.Value.OPRRankDifference = item.Value.OPRRank - item.Value.Rank;
             }
         }
 
@@ -235,12 +248,15 @@ namespace FTCData
 
         public int EvaluateTBP(string tbpExpression, int winningScore, int losingScore, int ownScore)
         {
-            var expr = new Expression(tbpExpression);
-            expr.Parameters["WinningScore"] = winningScore;
-            expr.Parameters["LosingScore"] = losingScore;
-            expr.Parameters["OwnScore"] = ownScore;
+            // Cache the expression for performance
+            if (_expr == null)
+                _expr = new Expression(tbpExpression);
 
-            return (int) Math.Round((double) expr.Evaluate());
+            _expr.Parameters["WinningScore"] = winningScore;
+            _expr.Parameters["LosingScore"] = losingScore;
+            _expr.Parameters["OwnScore"] = ownScore;
+
+            return (int) Math.Round(Convert.ToDouble(_expr.Evaluate()));
         }
 
         public void ClearTeamStats(Team team)
@@ -260,11 +276,14 @@ namespace FTCData
                 TeamCount = teams.Count,
                 HighScore = matches.Values.Max(m => Math.Max(m.RedScore, m.BlueScore)),
                 LowScore = matches.Values.Min(m => Math.Min(m.RedScore, m.BlueScore)),
-                AvgScore = (decimal)matches.Values.Average(m => (m.RedScore + m.BlueScore / 2)),
-                AvgVariance = (decimal)sortedTeams.Average(t => Math.Abs(t.RankVariance)),
+                AvgScore = (decimal) matches.Values.Average(m => (m.RedScore + m.BlueScore / 2)),
                 TopX = topX,
-                TopOprInTopRank = sortedTeams.Count(t => t.Rank <= topX && t.OPRRank <= topX),
-                AvgTopXVariance = (decimal)sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.RankVariance))
+                AvgOPRRankDifference = (decimal) sortedTeams.Average(t => Math.Abs(t.OPRRankDifference)),
+                AvgPPMRankDifference = (decimal)sortedTeams.Average(t => Math.Abs(t.PPMRankDifference)),
+                TopOPRInTopRank = sortedTeams.Count(t => t.Rank <= topX && t.OPRRank <= topX),
+                TopPPMInTopRank = sortedTeams.Count(t => t.Rank <= topX && t.PPMRank <= topX),
+                AvgTopXOPRRankDifference = (decimal) sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.OPRRankDifference)),
+                AvgTopXPPMRankDifference = (decimal) sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.PPMRankDifference))
             };
 
             return eventStats;
@@ -278,11 +297,13 @@ namespace FTCData
                 TeamCount = eventStatsList.Max(e => e.TeamCount),
                 HighScore = eventStatsList.Max(e => e.HighScore),
                 LowScore = eventStatsList.Min(e => e.LowScore),
-                AvgScore = (decimal)eventStatsList.Average(e => (e.AvgScore)),
-                AvgVariance = (decimal)eventStatsList.Average(e => e.AvgVariance),
+                AvgScore = eventStatsList.Average(e => (e.AvgScore)),
+                AvgOPRRankDifference = eventStatsList.Average(e => e.AvgOPRRankDifference),
+                AvgPPMRankDifference = eventStatsList.Average(e => e.AvgPPMRankDifference),
                 TopX = eventStatsList[0].TopX,
-                AvgTopOprInTopRank = (decimal)eventStatsList.Average(e => e.TopOprInTopRank),
-                AvgTopXVariance = (decimal)eventStatsList.Average(e => e.AvgTopXVariance)
+                AvgTopOPRInTopRank = (decimal) eventStatsList.Average(e => e.TopOPRInTopRank),
+                AvgTopXOPRRankDifference = eventStatsList.Average(e => e.AvgTopXOPRRankDifference),
+                AvgTopPPMInTopRank = (decimal) eventStatsList.Average(e => e.TopPPMInTopRank)
             };
 
             return batchStats;

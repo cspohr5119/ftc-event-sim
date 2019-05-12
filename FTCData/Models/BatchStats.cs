@@ -3,6 +3,7 @@
     public class BatchStats : EventStats
     {
         public int EventCount = 0;
-        public decimal AvgTopOprInTopRank = 0m;
+        public decimal AvgTopOPRInTopRank = 0m;
+        public decimal AvgTopPPMInTopRank = 0m;
     }
 }

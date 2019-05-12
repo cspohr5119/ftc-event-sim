@@ -46,7 +46,7 @@ namespace FTCData
                 var nameParts = name.Split('.');
                 if (nameParts.Length == 2)
                 {
-                    obj = options.GetType().GetField(nameParts[0]).GetValue(options);
+                    obj = options.GetType().GetProperty(nameParts[0]).GetValue(options);
                     prop = obj.GetType().GetField(nameParts[1]);
                 }
                 else

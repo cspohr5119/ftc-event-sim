@@ -24,7 +24,7 @@ on the command line.  It will run 1 event with 1 random round followed by 8 Swis
   OPRExcludesPenaltyPoints="true"
   OPRmmse="0">
   <RandomScheduling 
-    UseFTCSchdule="true" 
+    UseFTCSchedule="true" 
     UseFTCResults="false" 
   />
 
@@ -34,7 +34,7 @@ on the command line.  It will run 1 event with 1 random round followed by 8 Swis
   <SwissScheduling 
     SeedFirstRoundsOPR="false" 
     RoundsToScheduleAtStart="1" 
-    SchduleAtBreaks="false" 
+    ScheduleAtBreaks="false" 
     BreaksAfter="2,7" 
     OpponentPairingMethod="Fold" 
     AlliancePairingMethod="Slide" 

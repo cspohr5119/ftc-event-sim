@@ -2,88 +2,105 @@
 
 namespace FTCData.Models
 {
+    [XmlRoot("Options")]
     public class Options
     {
-        [XmlAttribute]
-        public string Title = @"Internal Default Configuration"; // Descriptive title for this configuration.  
-        [XmlAttribute]
-        public string EventKey = @"1819-CMP-DET1"; // EventKey from theorangealliance.org
-        [XmlAttribute]
-        public string DataFilesFolder = @"DataFiles"; // Relative path to the local folder where TOA files are.
-        [XmlAttribute]
-        public string SchedulingModel = "SwissSchduling";  // "RandomScheduling" or "SwissScheduling"
-        [XmlAttribute]
-        public string TBPMethod = "LosingScore";          // "LosingScore", "WinningScore", "OwnScore", "TotalScore", "Expression"
-        [XmlAttribute]
-        public string TBPExpression = "[OwnScore] + [LosingScore]"; // If TBPMethod is "Expresion", caluclate TBP with mathematical expresion 
-                                                                        // containing [LosingSocore], [WinningScore], and/or [OwnScore]
-        [XmlAttribute]
-        public decimal ScoreRandomness = 0;        // 0.0 - 1.0.  Alliance Score = OPR +/- (ScoreRandomness * OPR)
-        [XmlAttribute]
-        public int Rounds = 9;  // How many rounds to schedule in a tournament.
-        [XmlAttribute]
-        public int Trials = 1;  // How many tournaments to run as a batch.  Good for getting long-term averages.
-        [XmlAttribute]
-        public bool OPRExcludesPenaltyPoints = true;  // Removes penalty points from OPR calculation.
-        [XmlAttribute]
-        public decimal OPRmmse = 1;  // Minimum Mean Square Error: 1 - 3 recommended, 0 for traditional OPR values.
+        public Options()
+        {
+            RandomScheduling = new RandomSchedulingOptions();
+            SwissScheduling = new SwissSchedulingOptions();
+            Output = new OutputOptions();
+        }
 
-        public RandomSchedulingOptions RandomScheduling = new RandomSchedulingOptions();
-        public SwissSchedulingOptions SwissScheduling = new SwissSchedulingOptions();
-        public OutputOptions Output = new OutputOptions();
+        [XmlAttribute]
+        public string Title = "Internal defaults";
+        [XmlAttribute]
+        public string EventKey = "1819-CMP-DET1";
+        [XmlAttribute]
+        public string TeamPPMFile = "";
+        [XmlAttribute]
+        public string DataFilesFolder = "DataFiles";
+        [XmlAttribute]
+        public string SchedulingModel = "SwissScheduling";
+        [XmlAttribute]
+        public string TBPMethod = "LosingScore";
+        [XmlAttribute]
+        public string TBPExpression = "[OwnScore] + [LosingScore]";
+        [XmlAttribute]
+        public decimal ScoreRandomness = 0;
+        [XmlAttribute]
+        public int Rounds = 0;
+        [XmlAttribute]
+        public int Trials = 1;
+        [XmlAttribute]
+        public bool OPRExcludesPenaltyPoints = true;
+        [XmlAttribute]
+        public decimal OPRmmse = 1;
 
+        [XmlElement("RandomScheduling")]
+        public RandomSchedulingOptions RandomScheduling;
+        [XmlElement("SwissScheduling")]
+        public SwissSchedulingOptions SwissScheduling;
+        [XmlElement("Output")]
+        public OutputOptions Output;
+
+        [XmlRoot("RandomScheduling")]
         public class RandomSchedulingOptions
         {
             [XmlAttribute]
-            public bool UseFTCSchdule = true;   // Schedule matches as specified in EventFIle
+            public bool UseFTCSchedule = true;
             [XmlAttribute]
-            public bool UseFTCResults = false;  // Determine match winners from EventFile.  Specify false to use OPR.
+            public bool UseFTCResults = false;
         }
 
+        [XmlRoot("SwissScheduling")]
         public class SwissSchedulingOptions
         {
             [XmlAttribute]
-            public bool SeedFirstRoundsOPR = false;         // Set first round pairings from OPR, Random if false
+            public bool SeedFirstRoundsOPR = false;
             [XmlAttribute]
-            public int RoundsToScheduleAtStart = 1;         // How many rounds to schedule before play begins
+            public int RoundsToScheduleAtStart = 1;
             [XmlAttribute]
-            public bool SchduleAtBreaks = false;            // Schedule rounds after each break for multi-day tournaments
+            public string StartingRoundsOpponentPairingMethod = "Slide";
             [XmlAttribute]
-            public string BreaksAfter = "2,7";              // Play stops after these rounds
+            public bool ScheduleAtBreaks = false;
             [XmlAttribute]
-            public string OpponentPairingMethod = "Fold";   // "Fold" or "Slide"
+            public string BreaksAfter = "2,7";
             [XmlAttribute]
-            public string AlliancePairingMethod = "Slide";  // "Fold" or "Slide"
+            public string OpponentPairingMethod = "Fold";
             [XmlAttribute]
-            public int CostForPreviousOppoent = 100;        // All costs are multiplied by number of teams
+            public string AlliancePairingMethod = "Slide";
             [XmlAttribute]
-            public int CostForPreviousAlignment = 10;       // 
+            public int CostForPreviousOpponent = 100;
             [XmlAttribute]
-            public int CostForCrossingGroups = 10;          // Cost to pair teams or pairs across ranking groups
+            public int CostForPreviousAlignment = 10;
+            [XmlAttribute]
+            public int CostForCrossingGroups = 10;
         }
 
+        [XmlRoot("Output")]
         public class OutputOptions
         {
             [XmlAttribute]
-            public bool Title = true;                  // Write what is currently happening
+            public bool Title = true;
             [XmlAttribute]
-            public bool Status = true;                  // Write what is currently happening
+            public bool Status = true;
             [XmlAttribute]
-            public bool Headings = true;                // Write heading for each section of output
+            public bool Headings = true;
             [XmlAttribute]
-            public bool Matchups = true;                // Write Scheduled matchups whenever generated
+            public bool Matchups = true;
             [XmlAttribute]
-            public bool IncludeCurrentRank = true;      // Include team rank with team number such as 12345(5)
+            public bool IncludeCurrentRank = true;
             [XmlAttribute]
-            public bool RankingsAfterEachRound = false; // Write rankings after each round played
+            public bool RankingsAfterEachRound = false;
             [XmlAttribute]
-            public bool FinalRankings = true;           // Write Final Rankings
+            public bool FinalRankings = true;
             [XmlAttribute]
-            public int TopXStats = 6;                   // Write extra stats about Top X teams.  0 to supress
+            public int TopXStats = 6;
             [XmlAttribute]
-            public bool TrialStats = true;              // Write stats for every trial in a batch.
+            public bool TrialStats = true;
             [XmlAttribute]
-            public bool BatchStats = true;              // Write aggregated stats after all trials.
+            public bool BatchStats = true;
         }
     }
 }

@@ -25,7 +25,8 @@ namespace EventSim
             _scheduler = scheduler;
         }
 
-        public Engine(FTCData.Models.Options options) : this(options, new ConsoleOutput(options), new MatchRepository(options), new TeamRepository(), new Scheduler())
+        public Engine(FTCData.Models.Options options) : 
+            this(options, new ConsoleOutput(options), new MatchRepository(options), new TeamRepository(), new Scheduler(options))
         {
         }
 
@@ -33,10 +34,32 @@ namespace EventSim
         {
             _output.WriteStatus("Running " + trials + " trial(s)");
 
+            IDictionary<int, Team> teams = null;
+            IDictionary<int, Match> matches = null;
+
+            // Set things up depending on whether we're using an EventKey or TeamPPMFile
             var eventStatsList = new List<EventStats>();
-            var teams = PrepareTeamsFromFile(_options.DataFilesFolder, _options.EventKey);
-            var matches = PrepareMatchesFromFile(_options.DataFilesFolder, _options.EventKey, teams, true);
-            SetTeamsOPR(teams, matches);
+            if (!string.IsNullOrEmpty(_options.EventKey))
+            {
+                teams = PrepareTeamsFromEventKey(_options.DataFilesFolder, _options.EventKey);
+                matches = PrepareMatchesFromFile(_options.DataFilesFolder, _options.EventKey, teams, true);
+                SetTeamsPPM(teams, matches);
+            }
+            else if (!string.IsNullOrEmpty(_options.TeamPPMFile))
+            {
+                // override options if using TeamPPMFile
+                if (string.IsNullOrEmpty(_options.EventKey))
+                {
+                    _options.RandomScheduling.UseFTCResults = false;
+                    _options.RandomScheduling.UseFTCSchedule = false;
+                }
+
+                teams = PrepareTeamsFromPPMFile(_options.TeamPPMFile);
+            }
+            else
+            {
+                throw new InvalidOperationException("EventKey or TeamPPMFile must be provided in options");
+            }
 
             for (int trial = 1; trial <= trials; trial++)
             {
@@ -51,10 +74,14 @@ namespace EventSim
             return eventStatsList;
         }
 
-        public EventStats RunSimulation(IDictionary<int, Team> teams, IDictionary<int, Match> matches)
+        public EventStats RunSimulation(IDictionary<int, Team> teams, IDictionary<int, Match> matches = null)
         {
             var eventStats = new EventStats();
 
+            // Check if we have matches if required
+            if (_options.RandomScheduling.UseFTCResults && matches == null)
+                throw new InvalidOperationException("Matches must be provided if using RandomScheduling.UseFTCResults");
+            
             // run scheduling-specific simulation
             switch (_options.SchedulingModel)
             {
@@ -80,7 +107,7 @@ namespace EventSim
             _scheduler.AddNextRoundMatchesRandom(_options.Rounds, matches, teams);
 
             _output.WriteStatus("Setting match results for all rounds");
-            _matchRepo.SetMatchResultsFromOpr(matches);
+            _matchRepo.SetMatchResultsFromPPM(matches);
 
             _output.WriteStatus("Generating ranking");
             _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
@@ -112,41 +139,55 @@ namespace EventSim
         {
             _output.WriteStatus("Running event with Swiss scheduling");
 
-            if (_options.SwissScheduling.SeedFirstRoundsOPR)
-                throw new NotImplementedException("SeedFirstRoundOPR is not yet implemented.");
-
-            if (_options.SwissScheduling.SchduleAtBreaks)
-                throw new NotImplementedException("SchduleAtBreaks is not yet implemented.");
+            if (_options.SwissScheduling.ScheduleAtBreaks)
+                throw new NotImplementedException("ScheduleAtBreaks is not yet implemented.");
 
             var matches = new Dictionary<int, Match>();
 
-            _output.WriteStatus("Scheduling " + _options.SwissScheduling.RoundsToScheduleAtStart + " round(s) randomly");
-            for (int round = 1; round <= _options.SwissScheduling.RoundsToScheduleAtStart; round++)
+            if (_options.SwissScheduling.SeedFirstRoundsOPR)
             {
-                _output.WriteStatus("Scheduling round " + round + " randomly");
-                _scheduler.AddNextRoundMatchesRandom(1, matches, teams);
-                WriteMatchups(matches, round);
+                _output.WriteStatus("Scheduling " + _options.SwissScheduling.RoundsToScheduleAtStart + " Swiss (starting seeds)");
 
-                _output.WriteStatus("Setting match results for round " + round);
-                _matchRepo.SetMatchResultsFromOpr(matches);
+                SetRankingByPPM(teams);
+                for (int round = 1; round <= _options.SwissScheduling.RoundsToScheduleAtStart; round++)
+                {
+                    _output.WriteStatus("Scheduling round " + round + " Swiss " + _options.SwissScheduling.StartingRoundsOpponentPairingMethod);
+                    _scheduler.AddNextRoundMatchesSwiss(matches, round, teams, _options.SwissScheduling.StartingRoundsOpponentPairingMethod);
+                    WriteMatchups(matches, round);
+
+                    _output.WriteStatus("Setting match results for round " + round);
+                }
+                _matchRepo.SetMatchResultsFromPPM(matches);
                 _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
             }
+            else
+            {
+                _output.WriteStatus("Scheduling " + _options.SwissScheduling.RoundsToScheduleAtStart + " round(s) randomly");
+                for (int round = 1; round <= _options.SwissScheduling.RoundsToScheduleAtStart; round++)
+                {
+                    _output.WriteStatus("Scheduling round " + round + " randomly");
+                    _scheduler.AddNextRoundMatchesRandom(1, matches, teams);
+                    WriteMatchups(matches, round);
 
-
+                    _output.WriteStatus("Setting match results for round " + round);
+                    _matchRepo.SetMatchResultsFromPPM(matches);
+                    _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
+                }
+            }
+        
             int currentRound = _options.SwissScheduling.RoundsToScheduleAtStart + 1;
             for (int round = currentRound; round <= _options.Rounds; round++)
             {
                 _output.WriteStatus("Scheduling round " + round + " with Swiss algorithm");
-                _scheduler.AddNextRoundMatchesSwiss(matches, round, teams);
+                _scheduler.AddNextRoundMatchesSwiss(matches, round, teams, _options.SwissScheduling.OpponentPairingMethod);
+                WriteMatchups(matches, round);
 
                 _output.WriteStatus("Setting match results for round " + round);
-                _matchRepo.SetMatchResultsFromOpr(matches);
-                WriteMatchups(matches, round);
+                _matchRepo.SetMatchResultsFromPPM(matches);
 
                 _output.WriteStatus("Generating Rankings");
                 _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
                 WriteRankings(teams, _options.Output.RankingsAfterEachRound);
-
             }
 
             WriteRankings(teams, _options.Output.FinalRankings);
@@ -158,46 +199,21 @@ namespace EventSim
             return eventStats;
         }
 
-        public IDictionary<int, Match> PrepareFirstRoundMatches(IDictionary<int, Team> teams)
+        public void SetRankingByPPM(IDictionary<int, Team> teams)
         {
-            // prepare 1st round matches accoring to options
-            var matches = new Dictionary<int, Match>();
-            
-            if (_options.SchedulingModel == "RandomScheduling")
-            {
-                if (_options.RandomScheduling.UseFTCSchdule)
-                {
-                    // load all matches from FTC event file.  No matches will be created algorithmically
-                    _output.WriteStatus("Using actual FTC event schedule");
-                    matches = (Dictionary<int, Match>) PrepareMatchesFromFile(_options.DataFilesFolder, _options.EventKey, teams);
-                }
-                else
-                {
-                    _output.WriteStatus("Scheduling round 1 randomly");
-                    matches = new Dictionary<int, Match>();
-                    _scheduler.AddNextRoundMatchesRandom(1, matches, teams);
-                }
-            }
-            else
-            {
-                // We'll be using swiss model.  How are we generating first round?
-                if (_options.SwissScheduling.SeedFirstRoundsOPR)
-                {
-                    // TODO: Add OPR first-round seeding
-                    throw new NotImplementedException("SeedFirstRoundsOPR not yet supported.");
-                }
-                else
-                {
-                    _output.WriteStatus("Scheduling round 1 randomly");
-                    matches = new Dictionary<int, Match>();
-                    _scheduler.AddNextRoundMatchesRandom(1, matches, teams);
-                }
-            }
+            _teamRepo.ClearTeamStats(teams);
 
-            return matches;
+            var sortedTeams = teams.Values.OrderByDescending(t => t.PPM);
+            int rank = 1;
+            foreach (var team in sortedTeams)
+            {
+                team.Rank = rank;
+                team.PPMRank = rank;
+                rank++;
+            }
         }
 
-        public IDictionary<int, Team> PrepareTeamsFromFile(string folder, string eventKey)
+        public IDictionary<int, Team> PrepareTeamsFromEventKey(string folder, string eventKey)
         {
             _output.WriteStatus("Loading teams from " + eventKey);
             var teams = _teamRepo.GetTeamsFromTOAFile(folder, eventKey);
@@ -205,11 +221,19 @@ namespace EventSim
             return teams;
         }
 
-        public void SetTeamsOPR(IDictionary<int, Team> teams, IDictionary<int, Match> matches)
+        public IDictionary<int, Team> PrepareTeamsFromPPMFile(string teamPPMFile)
         {
-            _output.WriteStatus("Caculating team OPR from results file");
+            _output.WriteStatus("Loading teams from " + teamPPMFile);
+            var teams = _teamRepo.GetTeamsFromPPMFile(teamPPMFile);
+            _output.WriteStatus(string.Format("{0} teams loaded", teams.Count));
+            return teams;
+        }
+
+        public void SetTeamsPPM(IDictionary<int, Team> teams, IDictionary<int, Match> matches)
+        {
+            _output.WriteStatus("Caculating team PPM as OPR from results file");
             var oprCalculator = new OPRHelper(_options);
-            oprCalculator.SetTeamsOPR(teams, matches);
+            oprCalculator.SetTeamsOPR(teams, "PPM", matches);
         }
 
         public IDictionary<int, Match> PrepareMatchesFromFile(string folder, string eventKey, IDictionary<int, Team> teams, bool useActualScores = false)
@@ -227,10 +251,21 @@ namespace EventSim
                 return;
 
             _output.WriteHeading("Results with TBP = " + _options.TBPMethod);
-            _output.WriteHeading("Rank\tNumber\tRP\tTBP\tOPR\tOPRRank\tVariance");
+
+            _output.WriteHeading("Rank\tNumber\tPPM\tRP\tTBP\tOPR\tOPRRank\tOPRDif\tPPMRank\tPPMDif");
             foreach (var team in teams.Values.OrderBy(t => t.Rank))
             {
-                _output.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4:0.0}\t{5}\t{6}", team.Rank, team.Number, team.RP, team.TBP, team.OPR, team.OPRRank, team.RankVariance), true);
+                _output.WriteLine(string.Format("{0}\t{1}\t{2:0.0}\t{3}\t{4}\t{5:0.0}\t{6}\t{7}\t{8}\t{9}", 
+                    team.Rank, 
+                    team.Number, 
+                    team.PPM, 
+                    team.RP, 
+                    team.TBP, 
+                    team.CurrentOPR, 
+                    team.OPRRank, 
+                    team.OPRRankDifference, 
+                    team.PPMRank,
+                    team.PPMRankDifference), true);
             }
         }
 
@@ -239,18 +274,19 @@ namespace EventSim
             if (!_options.Output.TrialStats)
                 return;
 
-            _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tAvgVar\tTopX\tTopXVar\tInTopX");
+            _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tOPRDif\tTopX\tTopXDif\tOPRTopX\tPPMTopX");
             _output.WriteLine(String.Format(
-                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8}",
+                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8}\t{9}",
                 eventStats.TeamCount,
                 eventStats.MatchCount,
                 eventStats.HighScore,
                 eventStats.LowScore,
                 eventStats.AvgScore,
-                eventStats.AvgVariance,
+                eventStats.AvgOPRRankDifference,
                 eventStats.TopX,
-                eventStats.AvgTopXVariance,
-                eventStats.TopOprInTopRank
+                eventStats.AvgTopXOPRRankDifference,
+                eventStats.TopOPRInTopRank,
+                eventStats.TopPPMInTopRank
                 ), true);
         }
 
@@ -259,18 +295,19 @@ namespace EventSim
             if (!_options.Output.BatchStats)
                 return;
 
-            _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tAvgVar\tTopX\tTopXVar\tInTopX\tTrials");
+            _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tOPRDif\tTopX\tTopXDif\tOPRTopX\tPPMTopX\tTrials");
             _output.WriteLine(String.Format(
-                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8:0.00}\t{9}",
+                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8:0.00}\t{9}\t{10}",
                 eventStats.TeamCount,
                 eventStats.MatchCount,
                 eventStats.HighScore,
                 eventStats.LowScore,
                 eventStats.AvgScore,
-                eventStats.AvgVariance,
+                eventStats.AvgOPRRankDifference,
                 eventStats.TopX,
-                eventStats.AvgTopXVariance,
-                eventStats.AvgTopOprInTopRank,
+                eventStats.AvgTopXOPRRankDifference,
+                eventStats.AvgTopOPRInTopRank,
+                eventStats.AvgTopPPMInTopRank,
                 eventStats.EventCount
                 ), true);
         }

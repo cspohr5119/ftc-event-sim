@@ -9,6 +9,24 @@ namespace FTCData
 {
     public class TeamRepository
     {
+        public IDictionary<int, Team> GetTeamsFromPPMFile(string teamOPRFile)
+        {
+            var teams = new Dictionary<int, Team>();
+            string[] lines = File.ReadAllLines(teamOPRFile);
+            foreach(string line in lines)
+            {
+                string[] parts = line.Split(',');
+                if (parts[0] != "Team")  // skip header
+                {
+                    var team = new Team(int.Parse(parts[0]), parts[0]);
+                    team.PPM = int.Parse(parts[1]);
+                    teams.Add(team.Number, team);
+                }
+            }
+
+            return teams;
+        }
+
         public IDictionary<int, Team> GetTeamsFromTOAFile(string folder, string eventKey)
         {
             var teams = new Dictionary<int, Team>();
@@ -26,7 +44,7 @@ namespace FTCData
             foreach (var toaTeam in toaTeamDictionary)
             {
                 var team = new Team(int.Parse(toaTeam["team_key"]), toaTeam["team"]["team_name_short"]);
-                team.OPR = (decimal) toaTeam["opr"];
+                team.PPM = (decimal) toaTeam["opr"];
                 teams.Add(team.Number, team);
             }
 
@@ -66,9 +84,10 @@ namespace FTCData
             {
                 team.RP = 0;
                 team.TBP = 0;
-                team.OPRRank = 0;
+                team.PPMRank = 0;
                 team.Rank = 0;
-                team.RankVariance = 0;
+                team.OPRRankDifference = 0;
+                team.PPMRankDifference = 0;
                 team.HasAlignedWith.Clear();
                 team.HasOpposed.Clear();
                 team.Scheduled = 0;

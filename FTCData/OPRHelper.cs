@@ -16,13 +16,28 @@ namespace FTCData
             _options = options;
         }
 
-        public void SetTeamsOPR(IDictionary<int, Team> teams, IDictionary<int, Match> matches)
+        public void SetTeamsOPR(IDictionary<int, Team> teams, string propertyName, IDictionary<int, Match> matches)
         {
-            double mmse = (double) _options.OPRmmse;
+            // Set each team's OPR value from match results.
+
+            double mmse = (double)_options.OPRmmse;
             int[] teamList = teams.Values.Select(t => t.Number).ToArray<int>();
             int teamsPerAlliance = 2;
             int[][][] teamsPlaying = CreateTeamsPlayingArray(matches);
             int[][] score = CreateScoreArray(matches);
+
+            // If there has been only one round of matches, use the alliance score/2.  computeMMSE won't work in this case.
+            if (matches.Count == teams.Count / 4)
+            { 
+                for (int i = 0; i < score.Length; i++)
+                {
+                    matches[i + 1].Red1.CurrentOPR = score[i][0] / 2;
+                    matches[i + 1].Red2.CurrentOPR = score[i][0] / 2;
+                    matches[i + 1].Blue1.CurrentOPR = score[i][1] / 2;
+                    matches[i + 1].Blue2.CurrentOPR = score[i][1] / 2;
+                }
+                return;
+            }
 
             double[] oprArray = _oprCalculator.computeMMSE(mmse, teamList, teamsPerAlliance, teamsPlaying, score);
 
@@ -30,13 +45,23 @@ namespace FTCData
             {
                 int teamNumber = teamList[i];
                 var team = teams[teamNumber];
-                team.OPR = (decimal) oprArray[i];
+                if (propertyName == "PPM")
+                    team.PPM = (decimal)oprArray[i];
+                else
+                    try
+                    {
+                        // sometimes these are NaN.  Not sure why.
+                        team.CurrentOPR = (decimal)oprArray[i];
+                    }
+                    catch
+                    {
+                        team.CurrentOPR = -1;
+                    }
             }
         }
 
         public int[][][] CreateTeamsPlayingArray(IDictionary<int, Match> matches)
         {
-            // int[matches.Count][2][2] 
             int[][][] teamsPlaying = new int[matches.Count][][];
 
             for(int i = 0; i < matches.Count; i++)

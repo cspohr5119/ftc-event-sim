@@ -26,8 +26,11 @@ namespace FTCData.Models
         public int Scheduled{ get; set; }
         public int Played { get; set; }
         public int Rank { get; set; }
-        public decimal OPR { get; set; }
+        public decimal PPM { get; set; }
+        public decimal CurrentOPR { get; set; }
+        public int PPMRank { get; set; }
         public int OPRRank { get; set; }
-        public int RankVariance { get; set; }
+        public int OPRRankDifference { get; set; }
+        public int PPMRankDifference { get; set; }
     }
 }

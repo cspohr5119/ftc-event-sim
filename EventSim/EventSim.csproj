@@ -93,6 +93,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="DataFiles\1819-CMP-DET1Teams.json" />
+    <Content Include="DataFiles\TeamPPM40.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DataFiles\TeamPPM36.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Properties\app.manifest" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +112,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Options\HoustonJemisonAltTBP18.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Options\UseTeamOPRFile.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Options\HoustonJemisonSwiss18.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

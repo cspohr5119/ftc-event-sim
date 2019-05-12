@@ -15,20 +15,15 @@ namespace FTCData
         private readonly Options _options;
         private readonly MwMatch _matching;
 
-        public Scheduler() : this(new TeamRepository())
-        {
-        }
-
-        public Scheduler(TeamRepository teamRepo) : this(teamRepo, new Options())
-        {
-        }
-
         public Scheduler(TeamRepository teamRepo, Options options)
         {
             _teamRepo = teamRepo;
             _options = options;
             _matching = new MwMatch();
         }
+
+        public Scheduler(Options options) : this(new TeamRepository(), options)
+        { }
 
         public int GetNextRoundNumber(IDictionary<int, Match> matches)
         {
@@ -150,7 +145,7 @@ namespace FTCData
             return randomTeams;
         }
 
-        public int AddNextRoundMatchesSwiss(Dictionary<int, Match> matches, int round, IDictionary<int, Team> teams)
+        public int AddNextRoundMatchesSwiss(Dictionary<int, Match> matches, int round, IDictionary<int, Team> teams, string opponentPairingMethod)
         {
             // create a node for each team
             var nodeList = CreateNodesFromRankings(teams);
@@ -162,7 +157,7 @@ namespace FTCData
             var edges = new List<Edge>();
             foreach (var group in groups)
             {
-                edges.AddRange(CreateEdgesForGroup(group, _options.SwissScheduling.OpponentPairingMethod));
+                edges.AddRange(CreateEdgesForGroup(group, opponentPairingMethod));
             }
 
             // create edges across groups with increased cost
@@ -198,8 +193,7 @@ namespace FTCData
             var pairMatchups = GetPairMatchups(nodeList, pairEdges); // return Tuple<Tuple<Team, Team>, Tuple<Team, Team>>
 
             // Build and add matches to schedule
-            int matchesPerRound = teams.Count / 4;
-            int matchNumber = matches.Count + 2;
+            int matchNumber = matches.Count + 1;
 
             foreach (var pairMatchup in pairMatchups)
             {
@@ -247,7 +241,7 @@ namespace FTCData
         public IList<List<Node>> CreateGroups(IList<Node> nodes)
         {
             var groups = new List<List<Node>>();
-            int lastRP = 0;
+            int lastRP = -1;
             int currentRP = 0;
             var group = new List<Node>();
 

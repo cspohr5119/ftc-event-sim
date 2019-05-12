@@ -101,23 +101,25 @@ I get to it.
 ~~~~
   Title="My Tournament"    // Title message added to beginning of output
   EventKey="1819-CMP-DET"  // The event key from theorangealliance.org, found in the event URL.
+  TeamPPMFile=""		   // Relative path to a file of TeamNumber,PPM (points per match) to load instead of EventKey.
+  DataFilesFolder="DataFiles"  // Relative path to a folder containing download files from TOA.
   SchedulingModel="SwissScheduling"  // Supported values are "SwissScheduling", "RandomScheduling"
   TBPMethod="Expression"   // Supported values are "LosingScore", "WinningScore", "OwnScore", "TotalScore", "Expression"
   TBPExpresson="[OwnScore] + [LosingScore]" // Custom expression to calculate TBP (if TBPMethod is "Expression")
-  ScoreRandomness="0.1"    // Value beteen 0 and 1 and will make score = OPR +/- (OPR * ScoreRandomness)
+  ScoreRandomness="0.1"    // Value beteen 0 and 1 and will make score = PPM +/- (PPM * Rnd * ScoreRandomness)
   Rounds="5"               // How many times each team will play in the tournament.
   Trials="1"               // Will run the same simulation n-times and will aggregate the stats
   OPRExcludesPenaltyPoints="false"  // If true, will deduct penalty points for OPR calculation
   OPRmmse="0"              // Minimum Mean Square Error: 1 - 3 recommended, 0 for traditional OPR values.
     
   RandomScheduling 
-    UseFTCSchdule="true"   // If true, schedule the matches as they actually happened 
+    UseFTCSchedule="true"   // If true, schedule the matches as they actually happened 
     UseFTCResults="false"  // If true, use actual match scores, otherwise, based on OPR 
 
   SwissScheduling 
     SeedFirstRoundsOPR="false"    // Not yet suppored
     RoundsToScheduleAtStart="1"   // How many rounds to schedule randomly to start the tournament
-    SchduleAtBreaks="false"       // Not yet supported 
+    ScheduleAtBreaks="false"       // Not yet supported 
     BreaksAfter="2,7"             // Not yet suppored
     OpponentPairingMethod="Fold"  // Method to find ideal opponents: "Fold" or "Slide"
     AlliancePairingMethod="Slide" // Method to find ideal partners: "Fold" or "Slide"
@@ -138,28 +140,77 @@ I get to it.
     Title="true"                    // Show title
 ~~~~
 
+## Simulated Rankings
+The following is a partial listing of a ranking report the simulator generates at the end of the run.
+See the Stats section below for some definitions.
+
+~~~~
+Rank    Number  PPM     RP      TBP     OPR     OPRRank OPRDif  PPMRank PPMDif
+1       6929    317.4   16      8083    317.4   1       0       1       0
+2       10337   315.7   14      8297    315.7   2       0       2       0
+3       9441    297.4   14      8183    297.6   3       0       3       0
+4       11089   287.0   14      7626    286.9   4       0       4       0
+5       12670   282.8   14      7384    282.7   5       0       5       0
+6       10641   261.7   14      7182    261.5   9       3       9       3
+7       12808   265.2   14      6780    265.3   8       1       8       1
+8       5214    245.3   12      6812    245.3   10      2       10      2
+9       5667    245.1   12      6660    245.3   11      2       11      2
+10      5220    232.8   12      6512    232.7   13      3       13      3
+...
+~~~~
+
 ## Stats
-The ranking table includes each team's OPR values as calculated from actual match scores download
-from TOA.  OPR is used to caclulate scores for theoretical matchups.
+The ranking table includes each team's calculated OPR values as calculated from simulated match scores.  
+Downloaded OPR values are used at the beginning to set PPM, which is the base of points a team scores
+in simulated matches.
 
-OPRRank is also shown for each team in the rankings. This is what the team's ranking would be if
-ranking were solely on OPR.  
+Sample output:
+~~~~
+Teams   Matches High    Low     Avg     OPRDif  TopX    TopXDif OPRTopX PPMTopX
+64      144     583     87      536.47  5.22    7       0.57    5       5
+~~~~
 
-Variance is how many places "off" the actual rank is. -8 means a team ended with a rank 8 places
+**Team** is the number of teams in the event
+
+**Matches** is the number of all matches in the event
+
+**High** is the highest alliance score
+
+**Low** is the lowest alliance score
+
+**Avg** is the average alliance score
+
+**OPRDif** is the average difference between a team's final rank and their rank if ordered by OPR
+
+**TopX** is the TopX value specified in the options, which affects the following values...
+
+**TopXDiff** is the average difference between the top teams's final rank and OPR rank.
+
+**OPRTopX** is the number of top teams in the top ranks
+
+**PPMTopX** is the number of top teams by PPM in the top ranks
+
+Diffs are how many places "off" the actual rank is. -8 means a team ended with a rank 8 places
 below (or worse than) where they would have been if ranked by OPR.
 
-The stats section includes:
-
-AvgVar is the average absolute value of Variance for that event.  Lower numbers are obviously
-better, indicating teams where generally where they should be in the rankings.
-
-TopXVar is like AvgVariance, but for just the TopX number of teams.  This is useful to see if the
-"right" teams are ending up as alliance captains.
-
-InTopX is the number of TopX teams in OPR who made it into the TopXRank.  For example,
-how many of the top 6 OPR teams made it into the Top 6 ranks?
+**OPR** and **PPM** are similar, but mean different things.  PPM (points per match) is the number used by the
+simulator to generate scores with random variations as specified in the options.  OPR is calculated from match 
+results, estimating teams' average points per match from alliance totals.  These values should be close, and 
+in fact, virtually equal if there is no randomness applied.
 
 ## Change Log
+5/12/2019 Added first-round seeding for Swiss Tournaments.  Seed by rank based on PPM.
+
+5/11/2019 Renamed Team.OPR to Team.PPM (points per match), which is a static value set at the start of the event.
+
+5/11/2018 Calculating OPR on the fly from match scores, stored in Team.CurrentOPR.
+
+5/11/2019 Added support for TeamPPMFile, which will load an arbitrary list of team numbers with PPM values.
+
+5/11/2019 Fixed spelling in some Scheduling option names.
+
+5/11/2019 Miscellaneous refactoring.
+
 5/10/2019 Added expression evaluator for TBP.
 
 5/9/2019 Added OPR calculation options: OPRExcludesPenaltyPoints and OPRmmse.
