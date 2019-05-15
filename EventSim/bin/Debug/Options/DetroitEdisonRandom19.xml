@@ -42,6 +42,7 @@ Ranking should be similarly problematic as actual results, but will vary due to 
   <SwissScheduling 
     SeedFirstRoundsOPR="false" 
     RoundsToScheduleAtStart="1" 
+    ScheduleRoundsAhead="1"
     StartingRoundsOpponentPairingMethod="Slide"
     ScheduleAtBreaks="false" 
     BreaksAfter="2,7" 

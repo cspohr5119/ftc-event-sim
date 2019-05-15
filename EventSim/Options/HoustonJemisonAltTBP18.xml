@@ -36,12 +36,15 @@ These options will run an theoretical event with a provided list of teams and OP
 
   <!-- 
     Supported PairingMethod values are "Slide", "Fold"
+    ScheduleRoundsAhead is what round to schedule when a round ends.
+       For example, when round 3 ends, schedule round 5, means ScheduleRoundsAhead="2"
   -->
   <SwissScheduling 
     SeedFirstRoundsOPR="true"
-    RoundsToScheduleAtStart="1" 
+    RoundsToScheduleAtStart="2" 
+    ScheduleRoundsAhead="2"
     StartingRoundsOpponentPairingMethod="Slide"
-    ScheduleAtBreaks="false" 
+    ScheduleAtBreaks="true" 
     BreaksAfter="2,7" 
     OpponentPairingMethod="Fold" 
     AlliancePairingMethod="Slide" 

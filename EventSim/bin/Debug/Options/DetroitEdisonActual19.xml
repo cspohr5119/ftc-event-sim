@@ -41,6 +41,7 @@ Rankings should be the same as the offical rankings
   <SwissScheduling 
     SeedFirstRoundsOPR="false" 
     RoundsToScheduleAtStart="1" 
+    ScheduleRoundsAhead="1"
     StartingRoundsOpponentPairingMethod="Slide"
     ScheduleAtBreaks="false" 
     BreaksAfter="2,7" 

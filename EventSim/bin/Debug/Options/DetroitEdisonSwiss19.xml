@@ -41,6 +41,7 @@ with the Swiss system and assign PPM values as scores.  This is helpful when com
   <SwissScheduling 
     SeedFirstRoundsOPR="false" 
     RoundsToScheduleAtStart="1" 
+    ScheduleRoundsAhead="1"
     StartingRoundsOpponentPairingMethod="Slide"
     ScheduleAtBreaks="false" 
     BreaksAfter="2,7" 

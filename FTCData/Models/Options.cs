@@ -61,6 +61,8 @@ namespace FTCData.Models
             [XmlAttribute]
             public int RoundsToScheduleAtStart = 1;
             [XmlAttribute]
+            public int ScheduleRoundsAhead = 1;
+            [XmlAttribute]
             public string StartingRoundsOpponentPairingMethod = "Slide";
             [XmlAttribute]
             public bool ScheduleAtBreaks = false;

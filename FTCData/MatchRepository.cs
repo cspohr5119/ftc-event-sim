@@ -103,6 +103,16 @@ namespace FTCData
             }
         }
 
+        public void SetMatchResultsFromPPM(IDictionary<int, Match> matches, int round)
+        {
+            foreach (var match in matches.Values.Where(m => m.Played == false && m.Round == round))
+            {
+                match.Played = true;
+                match.RedScore = CalculateAllianceScore(match.Red1, match.Red2);
+                match.BlueScore = CalculateAllianceScore(match.Blue1, match.Blue2);
+            }
+        }
+
         public int CalculateAllianceScore(Team team1, Team team2)
         {
             int score = (int)Math.Round(team1.PPM + team2.PPM, 0);

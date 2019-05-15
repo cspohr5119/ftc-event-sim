@@ -139,59 +139,104 @@ namespace EventSim
         {
             _output.WriteStatus("Running event with Swiss scheduling");
 
-            if (_options.SwissScheduling.ScheduleAtBreaks)
-                throw new NotImplementedException("ScheduleAtBreaks is not yet implemented.");
-
             var matches = new Dictionary<int, Match>();
+            int schedulingRound = 1;
+            int playingRound = 1;
+            List<int> breaksAfter;
 
-            if (_options.SwissScheduling.SeedFirstRoundsOPR)
-            {
-                _output.WriteStatus("Scheduling " + _options.SwissScheduling.RoundsToScheduleAtStart + " Swiss (starting seeds)");
+            // Set initial ranks for seeded start (will not be used if Random start)
+            SetRankingByPPM(teams);
 
-                SetRankingByPPM(teams);
-                for (int round = 1; round <= _options.SwissScheduling.RoundsToScheduleAtStart; round++)
-                {
-                    _output.WriteStatus("Scheduling round " + round + " Swiss " + _options.SwissScheduling.StartingRoundsOpponentPairingMethod);
-                    _scheduler.AddNextRoundMatchesSwiss(matches, round, teams, _options.SwissScheduling.StartingRoundsOpponentPairingMethod);
-                    WriteMatchups(matches, round);
-
-                    _output.WriteStatus("Setting match results for round " + round);
-                }
-                _matchRepo.SetMatchResultsFromPPM(matches);
-                _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
-            }
+            // Get list of last match for each day
+            _output.WriteStatus("Breaks after " + _options.SwissScheduling.BreaksAfter);
+            if (_options.SwissScheduling.ScheduleAtBreaks)
+                breaksAfter = _options.SwissScheduling.BreaksAfter.Split(',').Select(b => int.Parse(b)).OrderBy(b => b).ToList<int>();
             else
+                breaksAfter = new List<int>();
+
+            // Add a break for the last match of the last day
+            breaksAfter.Add(_options.Rounds);
+
+            // Run each day, creating the first rounds of the day's schedule at the start of each day
+            for (int day = 1; day <= breaksAfter.Count; day++)
             {
-                _output.WriteStatus("Scheduling " + _options.SwissScheduling.RoundsToScheduleAtStart + " round(s) randomly");
-                for (int round = 1; round <= _options.SwissScheduling.RoundsToScheduleAtStart; round++)
+                // Start of day.  Schedule the first round(s)
+
+                int dayStartingRound = playingRound;
+                int scheduleTo = breaksAfter[day - 1];
+
+                // Figure out how many rounds to schedule at the start of day.  Consider the first and last day may be shorter
+                int startingRoundsToSchedule = Math.Min(_options.SwissScheduling.RoundsToScheduleAtStart, scheduleTo - schedulingRound + 1);
+
+                if (_options.SwissScheduling.SeedFirstRoundsOPR == false && day == 1)
                 {
-                    _output.WriteStatus("Scheduling round " + round + " randomly");
-                    _scheduler.AddNextRoundMatchesRandom(1, matches, teams);
-                    WriteMatchups(matches, round);
-
-                    _output.WriteStatus("Setting match results for round " + round);
-                    _matchRepo.SetMatchResultsFromPPM(matches);
-                    _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
+                    // It's day 1 and we're not seeding the swiss schedule.  Schedule first round(s) randomly.
+                    _output.WriteStatus("Scheduling " + startingRoundsToSchedule + " round(s) randomly - Day " + day);
+                    for (schedulingRound = 1; schedulingRound <= startingRoundsToSchedule; schedulingRound++)
+                    {
+                        _output.WriteStatus("Scheduling round " + schedulingRound + " randomly");
+                        _scheduler.AddNextRoundMatchesRandom(1, matches, teams);
+                        WriteMatchups(matches, schedulingRound);
+                    }
                 }
+                else
+                {
+                    // Use team rank to seed Swiss schedule for day 2 and beyond, and day 1 if using seeding on day 1
+                    _output.WriteStatus("Scheduling " + startingRoundsToSchedule + " round(s) Swiss  - Day " + day);
+
+                    for (schedulingRound = dayStartingRound; schedulingRound < dayStartingRound + startingRoundsToSchedule; schedulingRound++)
+                    {
+                        // Set opponent pairing method.  May be different for opening matches.
+                        string pairingMethod;
+                        if (day == 1)
+                            pairingMethod = _options.SwissScheduling.StartingRoundsOpponentPairingMethod;
+                        else
+                            pairingMethod = _options.SwissScheduling.OpponentPairingMethod;
+
+                        _output.WriteStatus("Scheduling round " + schedulingRound + " Swiss " + pairingMethod);
+                        _scheduler.AddNextRoundMatchesSwiss(matches, schedulingRound, teams, pairingMethod);
+                        WriteMatchups(matches, schedulingRound);
+                    }
+                }
+
+                // Work through each day.  We should already have a schedule set for at least the next round
+                for (playingRound = dayStartingRound; playingRound <= breaksAfter[day - 1]; playingRound++)
+                {
+                    // Set the results for the current round of matches
+                    _output.WriteStatus("Setting match results for round " + playingRound);
+                    _matchRepo.SetMatchResultsFromPPM(matches, playingRound);
+
+                    // Set the rankings
+                    _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
+                    _output.WriteStatus("Generating Rankings");
+                    WriteRankings(teams, _options.Output.RankingsAfterEachRound);
+
+                    // Schedule upcoming matches...
+
+                    // Calculate range of upcomming rounds to schedule for this day
+                    int startSchedulingRound = schedulingRound;
+                    int endSchedulingRound = playingRound + _options.SwissScheduling.ScheduleRoundsAhead;
+
+                    // Limit the work-ahead to the last match of the day
+                    if (endSchedulingRound > scheduleTo)
+                        endSchedulingRound = scheduleTo;
+
+                    // Schedule the next batch of rounds
+                    for (schedulingRound = startSchedulingRound; schedulingRound <= endSchedulingRound; schedulingRound++)
+                    {
+                        _output.WriteStatus("Scheduling round " + schedulingRound + " Swiss " + _options.SwissScheduling.OpponentPairingMethod);
+                        _scheduler.AddNextRoundMatchesSwiss(matches, schedulingRound, teams, _options.SwissScheduling.OpponentPairingMethod);
+                        WriteMatchups(matches, schedulingRound);
+                    }
+                    // round has been played and future matches scheduled.  Repeat for each match of the day 
+                }
+                // day is complete.  Repeat for next day
             }
-        
-            int currentRound = _options.SwissScheduling.RoundsToScheduleAtStart + 1;
-            for (int round = currentRound; round <= _options.Rounds; round++)
-            {
-                _output.WriteStatus("Scheduling round " + round + " with Swiss algorithm");
-                _scheduler.AddNextRoundMatchesSwiss(matches, round, teams, _options.SwissScheduling.OpponentPairingMethod);
-                WriteMatchups(matches, round);
 
-                _output.WriteStatus("Setting match results for round " + round);
-                _matchRepo.SetMatchResultsFromPPM(matches);
-
-                _output.WriteStatus("Generating Rankings");
-                _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
-                WriteRankings(teams, _options.Output.RankingsAfterEachRound);
-            }
-
+            // All rounds complete.  Write the final rankings
             WriteRankings(teams, _options.Output.FinalRankings);
 
+            // Populate the event stats
             _output.WriteStatus("Generating event stats");
             var eventStats = _matchRepo.GetEventStats(teams, matches, _options.Output.TopXStats);
             WriteEventStats(eventStats);

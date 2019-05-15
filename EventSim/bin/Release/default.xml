@@ -33,7 +33,8 @@ on the command line.  It will run 1 event with 1 random round followed by 8 Swis
   -->
   <SwissScheduling 
     SeedFirstRoundsOPR="false" 
-    RoundsToScheduleAtStart="1" 
+    RoundsToScheduleAtStart="1"
+    ScheduleRoundsAhead="1"
     ScheduleAtBreaks="false" 
     BreaksAfter="2,7" 
     OpponentPairingMethod="Fold" 

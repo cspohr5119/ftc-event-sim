@@ -18,7 +18,7 @@ These options will run an theoretical event with a provided list of teams and OP
 -->
 <Options 
   Title="TeamPPMFile"
-  EventKey=""
+  EventKey=""+
   TeamPPMFile="DataFiles\TeamPPM40.csv"
   DataFilesFolder="DataFiles"
   SchedulingModel="SwissScheduling" 
@@ -39,7 +39,8 @@ These options will run an theoretical event with a provided list of teams and OP
   -->
   <SwissScheduling 
     SeedFirstRoundsOPR="true"
-    RoundsToScheduleAtStart="1" 
+    RoundsToScheduleAtStart="1"
+    ScheduleRoundsAhead="1"
     StartingRoundsOpponentPairingMethod="Slide"
     ScheduleAtBreaks="false" 
     BreaksAfter="2,7" 

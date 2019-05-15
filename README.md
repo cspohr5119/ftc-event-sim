@@ -117,12 +117,14 @@ I get to it.
     UseFTCResults="false"  // If true, use actual match scores, otherwise, based on OPR 
 
   SwissScheduling 
-    SeedFirstRoundsOPR="false"    // Not yet suppored
-    RoundsToScheduleAtStart="1"   // How many rounds to schedule randomly to start the tournament
-    ScheduleAtBreaks="false"       // Not yet supported 
-    BreaksAfter="2,7"             // Not yet suppored
+    SeedFirstRoundsOPR="false"    // Use initial PPM (set to initial OPR) to seed first rounds as Swiss (Random if false).
+    RoundsToScheduleAtStart="1"   // How many rounds to schedule at the start of the day
+	ScheduleRoundsAhead="2"       // How many rounds ahead to schedule.  To schedule round 3 when round 1 is finishes, set to 2.
+	ScheduleAtBreaks="false"      // Generate a schedule of n matches at the start of each day where n = RoundsToScheduleAtStart
+    BreaksAfter="2,7"             // When the overnight breaks are. Could be used in one-day events as intermissions
     OpponentPairingMethod="Fold"  // Method to find ideal opponents: "Fold" or "Slide"
     AlliancePairingMethod="Slide" // Method to find ideal partners: "Fold" or "Slide"
+	StartingRoundsOpponentPairingMethod = "Slide" // Method to pair seeded opponents at start of tournament
     CostForPreviousOppoent="100"  // Cost penalty for same opponent twice
     CostForPreviousAlignment="10" // Cost penalty for same alliance twice 
     CostForCrossingGroups="10"    // Cost penalty for opponents in different RP groups
@@ -130,14 +132,14 @@ I get to it.
   Output 
     Status="true"                   // Messages that say what's currently happening
     Headings="true"                 // Table header rows
-    Matchups="true"                 // Show teams matchups for each round
+    Matchups="true"                 // Show teams' matchups for each round
     IncludeCurrentRank="true"       // Not yet supported
     RankingsAfterEachRound="false"  // Show ranking table after each round
     FinalRankings="true"            // Ranking table at end of event
     TopXStats="6"                   // Number of teams in TopX stats.
-    TrialStats="true"               // Stats for each event
-    BatchStats="true"               // Aggregated stats (for multiple trials in a batch)
-    Title="true"                    // Show title
+    TrialStats="true"               // Stats for each trial
+    BatchStats="true"               // Aggregated stats (sums and averages across multiple trials in a batch)
+    Title="true"                    // Show Title value from the optons at start of run
 ~~~~
 
 ## Simulated Rankings
@@ -170,25 +172,25 @@ Teams   Matches High    Low     Avg     OPRDif  TopX    TopXDif OPRTopX PPMTopX
 64      144     583     87      536.47  5.22    7       0.57    5       5
 ~~~~
 
-**Team** is the number of teams in the event
+**Teams** is the number of teams in the event.
 
-**Matches** is the number of all matches in the event
+**Matches** is the number of all matches in the event.
 
-**High** is the highest alliance score
+**High** is the highest alliance score.
 
-**Low** is the lowest alliance score
+**Low** is the lowest alliance score.
 
-**Avg** is the average alliance score
+**Avg** is the average alliance score.
 
-**OPRDif** is the average difference between a team's final rank and their rank if ordered by OPR
+**OPRDif** is the average difference between a team's final rank and their rank if ordered by OPR.
 
 **TopX** is the TopX value specified in the options, which affects the following values...
 
 **TopXDiff** is the average difference between the top teams's final rank and OPR rank.
 
-**OPRTopX** is the number of top teams in the top ranks
+**OPRTopX** is the number of top teams in the top ranks.
 
-**PPMTopX** is the number of top teams by PPM in the top ranks
+**PPMTopX** is the number of top teams by PPM in the top ranks.
 
 Diffs are how many places "off" the actual rank is. -8 means a team ended with a rank 8 places
 below (or worse than) where they would have been if ranked by OPR.
@@ -199,6 +201,9 @@ results, estimating teams' average points per match from alliance totals.  These
 in fact, virtually equal if there is no randomness applied.
 
 ## Change Log
+5/14/2019 Added multi-day tournaments with RoundsToScheduleAtStart, ScheduleAtBreaks, BeaksAfter, ScheduleRoundsAhead,
+and StartingRoundsOpponentPairingMethod options.
+
 5/12/2019 Added first-round seeding for Swiss Tournaments.  Seed by rank based on PPM.
 
 5/11/2019 Renamed Team.OPR to Team.PPM (points per match), which is a static value set at the start of the event.
