@@ -119,12 +119,12 @@ I get to it.
   SwissScheduling 
     SeedFirstRoundsOPR="false"    // Use initial PPM (set to initial OPR) to seed first rounds as Swiss (Random if false).
     RoundsToScheduleAtStart="1"   // How many rounds to schedule at the start of the day
-	ScheduleRoundsAhead="2"       // How many rounds ahead to schedule.  To schedule round 3 when round 1 is finishes, set to 2.
-	ScheduleAtBreaks="false"      // Generate a schedule of n matches at the start of each day where n = RoundsToScheduleAtStart
+    ScheduleRoundsAhead="2"       // How many rounds ahead to schedule.  To schedule round 3 when round 1 is finishes, set to 2.
+    ScheduleAtBreaks="false"      // Generate a schedule of n matches at the start of each day where n = RoundsToScheduleAtStart
     BreaksAfter="2,7"             // When the overnight breaks are. Could be used in one-day events as intermissions
     OpponentPairingMethod="Fold"  // Method to find ideal opponents: "Fold" or "Slide"
     AlliancePairingMethod="Slide" // Method to find ideal partners: "Fold" or "Slide"
-	StartingRoundsOpponentPairingMethod = "Slide" // Method to pair seeded opponents at start of tournament
+    StartingRoundsOpponentPairingMethod = "Slide" // Method to pair seeded opponents at start of tournament
     CostForPreviousOppoent="100"  // Cost penalty for same opponent twice
     CostForPreviousAlignment="10" // Cost penalty for same alliance twice 
     CostForCrossingGroups="10"    // Cost penalty for opponents in different RP groups
