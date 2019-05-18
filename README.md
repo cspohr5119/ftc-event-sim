@@ -203,6 +203,9 @@ results, estimating teams' average points per match from alliance totals.  These
 in fact, virtually equal if there is no randomness applied.
 
 ## Change Log
+5/19/2019 Added support for Laplace distribution in ScoreRandomness.  Studing real event data, the random distribution
+seemed to follow this type of curve.  Tighness and skew are also controlled by values in the options file.
+
 5/14/2019 Added multi-day tournaments with RoundsToScheduleAtStart, ScheduleAtBreaks, BeaksAfter, ScheduleRoundsAhead,
 and StartingRoundsOpponentPairingMethod options.
 
