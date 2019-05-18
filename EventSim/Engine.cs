@@ -113,6 +113,8 @@ namespace EventSim
             _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
             WriteRankings(teams, _options.Output.FinalRankings);
 
+            WriteMatchScores(matches);
+
             _output.WriteStatus("Generating event stats");
             var eventStats = _matchRepo.GetEventStats(teams, matches, _options.Output.TopXStats);
             WriteEventStats(eventStats);
@@ -127,6 +129,8 @@ namespace EventSim
             _output.WriteStatus("Generating Ranking");
             _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
             WriteRankings(teams, _options.Output.FinalRankings);
+
+            WriteMatchScores(matches);
 
             _output.WriteStatus("Generating event stats");
             var eventStats = _matchRepo.GetEventStats(teams, matches, _options.Output.TopXStats);
@@ -235,6 +239,8 @@ namespace EventSim
 
             // All rounds complete.  Write the final rankings
             WriteRankings(teams, _options.Output.FinalRankings);
+
+            WriteMatchScores(matches);
 
             // Populate the event stats
             _output.WriteStatus("Generating event stats");
@@ -355,6 +361,43 @@ namespace EventSim
                 eventStats.AvgTopPPMInTopRank,
                 eventStats.EventCount
                 ), true);
+        }
+
+        private void WriteMatchScores(IDictionary<int, Match> matches)
+        {
+            if (!_options.Output.MatchScores)
+                return;
+
+            _output.WriteHeading("Match\tColor\tTeam1\tTeam2\tScore\tPPM1\tPPM2\tPPMtot\tScore-PPMtot");
+
+            foreach (var match in matches.Values.OrderBy(m => m.MatchNumber))
+            {
+                _output.WriteLine(
+                    string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5:0.0}\t{6:0.0}\t{7:0.0}\t{8:0.0}",
+                    match.MatchNumber,
+                    "Red",
+                    match.Red1.Number,
+                    match.Red2.Number,
+                    match.RedScore,
+                    match.Red1.PPM,
+                    match.Red2.PPM,
+                    match.Red1.PPM + match.Red2.PPM,
+                    match.RedScore - match.Red1.PPM - match.Red2.PPM
+                    ), true);
+
+                _output.WriteLine(
+                    string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5:0.0}\t{6:0.0}\t{7:0.0}\t{8:0.0}",
+                    match.MatchNumber,
+                    "Blue",
+                    match.Blue1.Number,
+                    match.Blue2.Number,
+                    match.BlueScore,
+                    match.Blue1.PPM,
+                    match.Blue2.PPM,
+                    match.Blue1.PPM + match.Blue2.PPM,
+                    match.BlueScore - match.Blue1.PPM - match.Blue2.PPM
+                    ), true);
+            }
         }
 
         private void WriteMatchups(IDictionary<int, Match> matches, int round)

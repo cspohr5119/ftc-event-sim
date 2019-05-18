@@ -112,6 +112,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Options\TestRandomDistribution.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Options\HoustonJemisonAltTBP18.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

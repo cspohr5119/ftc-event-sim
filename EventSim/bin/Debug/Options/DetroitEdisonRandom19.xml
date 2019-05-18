@@ -10,7 +10,10 @@ Ranking should be similarly problematic as actual results, but will vary due to 
   Supported SchedulingModel values are "SwissScheduling", "RandomScheduling"
   Supported TBPMethod values are "LosingScore", "WinningScore", "OwnScore", "TotalScore"
   ScoreRandomness is a value between 0 and 1.  This will give a random component to teams 
-    score where score = PPM +/- (PPM * ScoreRandomness).
+    score where score = PPM +/- (PPM * ScoreRandomness).  The random factor conforms to
+    a Laplace distribution, with a dense center peak, controlled by the RandomTightness option.
+    The skew will provide a longer tail on one side or the other.  Less than 1.0 puts the longer
+    tail on the left as observed in data from actual events.
   OPRmmse 1-3 recommended, 0 for traditional OPR calculation.
   TBPExpression is a mathematical expression that will be used if TBPMethod is "Expression"  It will
     evaluate a forumla containing bracketed variables [WinningScore], [LosingScore], and/or [OwnScore]
@@ -27,6 +30,8 @@ Ranking should be similarly problematic as actual results, but will vary due to 
   TBPMethod="Expression" 
   TBPExpression="([OwnScore] + [LosingScore] / 2)"
   ScoreRandomness="0" 
+  RandomTightness="2.0"
+  RandomSkew="0.8"
   Rounds="9"
   Trials="1"
   OPRExcludesPenaltyPoints="false"
@@ -64,6 +69,7 @@ Ranking should be similarly problematic as actual results, but will vary due to 
     IncludeCurrentRank="true" 
     RankingsAfterEachRound="false" 
     FinalRankings="true" 
+    MatchScores = "false"
     TopXStats="6" 
     TrialStats="true" 
     BatchStats="true" 

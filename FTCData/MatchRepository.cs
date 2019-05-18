@@ -7,18 +7,22 @@ using System.IO;
 using System.Web.Script.Serialization;
 using System.Configuration;
 using NCalc;
+using MathNet.Numerics.Distributions;
 
 namespace FTCData
 {
     public class MatchRepository
     {
         private readonly Options _options;
-        private readonly Random _rnd = new Random();
+        private readonly Laplace _laplace;
+
         private Expression _expr = null;
+
 
         public MatchRepository(Options options)
         {
             _options = options;
+            _laplace = new Laplace(0.0, (double) _options.RandomTightness);
         }
 
         public IDictionary<int, Match> GetMatchesFromTOAFile(IDictionary<int, Team> teams, string folder, string eventKey, bool includeActualScores = false)
@@ -115,15 +119,45 @@ namespace FTCData
 
         public int CalculateAllianceScore(Team team1, Team team2)
         {
-            int score = (int)Math.Round(team1.PPM + team2.PPM, 0);
+            decimal score = team1.PPM + team2.PPM;
             if (_options.ScoreRandomness > 0.0m)
-            { 
-                int scoreMin = score - (int)(score * _options.ScoreRandomness);
-                int scoreMax = score + (int)(score * _options.ScoreRandomness) + 1;
-                score = _rnd.Next(scoreMin, scoreMax);
+            {
+                return RandomLaplace((double) score);
             }
 
-            return score;
+            return (int) Math.Round(score);
+        }
+
+        public int RandomLaplace(double score)
+        {
+            double scoreMin = score - (score * (double)_options.ScoreRandomness);
+            double scoreMax = score + (score * (double)_options.ScoreRandomness * .79); // range max is about 79% of range min
+
+            // Get a random value with a gamma distribution
+            double rndLaplace;
+
+            // Generate a Laplace-distributed random number between 0 and 1
+            double rndNormalized = 0.0;
+            while (rndNormalized < 0.001 || rndNormalized > 0.999)  // prevent occasional wacky numbers
+            {
+                rndLaplace = _laplace.Sample();  // Random number number between -10 and about 10, with a distribution peak at 0.
+                rndNormalized = (rndLaplace + 10.0) / 20.0;
+            }
+
+            // Apply the skew by raising to the skew value power
+            double rndSkewed = Math.Pow(rndNormalized, 0.8);
+
+            // Scale the number to the range we're looking for
+            double rndScaled = rndSkewed * (scoreMax - scoreMin);
+
+            // calculate the new score!
+            score = rndScaled + scoreMin; 
+
+            // Just in case, score can't be < 0;
+            if (score < 0)
+                score = 0;
+
+            return (int)Math.Round(score, 0);
         }
 
         public void SetRankings(IDictionary<int, Match> matches, IDictionary<int, Team> teams, string tbpMethod)
@@ -280,6 +314,10 @@ namespace FTCData
         public EventStats GetEventStats(IDictionary<int, Team> teams, IDictionary<int, Match> matches, int topX)
         {
             var sortedTeams = teams.Values.OrderBy(t => t.Rank).ToList();
+
+
+
+
             var eventStats = new EventStats
             {
                 MatchCount = matches.Count,
@@ -292,9 +330,17 @@ namespace FTCData
                 AvgPPMRankDifference = (decimal)sortedTeams.Average(t => Math.Abs(t.PPMRankDifference)),
                 TopOPRInTopRank = sortedTeams.Count(t => t.Rank <= topX && t.OPRRank <= topX),
                 TopPPMInTopRank = sortedTeams.Count(t => t.Rank <= topX && t.PPMRank <= topX),
-                AvgTopXOPRRankDifference = (decimal) sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.OPRRankDifference)),
-                AvgTopXPPMRankDifference = (decimal) sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.PPMRankDifference))
+                AvgTopXOPRRankDifference = 0,
+                AvgTopXPPMRankDifference = 0
             };
+
+            // AvgTopX calculations need at least one team in the top rank to be in topX, otherwise it breaks
+
+            if (eventStats.TopOPRInTopRank > 0)
+                eventStats.AvgTopXOPRRankDifference = (decimal)sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.OPRRankDifference));
+
+            if (eventStats.TopPPMInTopRank > 0)
+                eventStats.AvgTopXPPMRankDifference = (decimal)sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.PPMRankDifference));
 
             return eventStats;
         }

@@ -29,7 +29,11 @@ namespace FTCData.Models
         [XmlAttribute]
         public decimal ScoreRandomness = 0;
         [XmlAttribute]
-        public int Rounds = 0;
+        public decimal RandomTightness = 1.8m;
+        [XmlAttribute]
+        public decimal RandomSkew = 0.8m;
+        [XmlAttribute]
+        public int Rounds = 9;
         [XmlAttribute]
         public int Trials = 1;
         [XmlAttribute]
@@ -97,6 +101,8 @@ namespace FTCData.Models
             public bool RankingsAfterEachRound = false;
             [XmlAttribute]
             public bool FinalRankings = true;
+            [XmlAttribute]
+            public bool MatchScores = false;
             [XmlAttribute]
             public int TopXStats = 6;
             [XmlAttribute]

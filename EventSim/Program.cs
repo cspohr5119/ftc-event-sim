@@ -27,7 +27,7 @@ namespace EventSim
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error reading options file {0}\r{1}", args[0], ex.Message);
+                    Console.WriteLine("Error reading options file {0}\n{1}", args[0], ex.Message);
                     return;
                 }
             }

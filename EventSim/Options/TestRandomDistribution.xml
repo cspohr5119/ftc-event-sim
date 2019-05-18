@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
-These options will run an theoretical event with a provided list of teams and OPR values.
+These options will run an actual schedule with actual results.
+Rankings should be the same as the offical rankings 
 -->
 
 <!-- 
@@ -20,36 +21,34 @@ These options will run an theoretical event with a provided list of teams and OP
     will be forced false.
 -->
 <Options 
-  Title="Houston Jemison 2018 Swiss Alternate TBP"
-  EventKey="1718-CMP-HOU2"
+  Title="Detroit Edison 2019 Actual - Random Score Distribution Test"
+  EventKey="1819-CMP-DET1"
   TeamPPMFile=""
   DataFilesFolder="DataFiles"
-  SchedulingModel="SwissScheduling" 
-  TBPMethod="Expression" 
-  TBPExpression="[LosingScore] + [OwnScore]"
-  ScoreRandomness="0"
+  SchedulingModel="RandomScheduling" 
+  TBPMethod="LosingScore" 
+  TBPExpression=""
+  ScoreRandomness="0.95" 
   RandomTightness="1.8"
   RandomSkew="0.8"
   Rounds="9" 
   Trials="1"
-  OPRExcludesPenaltyPoints="true"
+  OPRExcludesPenaltyPoints="false"
   OPRmmse="0">
   <RandomScheduling 
-    UseFTCSchedule="false" 
-    UseFTCResults="false" 
+    UseFTCSchedule="true" 
+    UseFTCResults="true" 
   />
 
   <!-- 
     Supported PairingMethod values are "Slide", "Fold"
-    ScheduleRoundsAhead is what round to schedule when a round ends.
-       For example, when round 3 ends, schedule round 5, means ScheduleRoundsAhead="2"
   -->
   <SwissScheduling 
-    SeedFirstRoundsOPR="true"
-    RoundsToScheduleAtStart="2" 
-    ScheduleRoundsAhead="2"
+    SeedFirstRoundsOPR="false" 
+    RoundsToScheduleAtStart="1" 
+    ScheduleRoundsAhead="1"
     StartingRoundsOpponentPairingMethod="Slide"
-    ScheduleAtBreaks="true" 
+    ScheduleAtBreaks="false" 
     BreaksAfter="2,7" 
     OpponentPairingMethod="Fold" 
     AlliancePairingMethod="Slide" 
@@ -62,16 +61,16 @@ These options will run an theoretical event with a provided list of teams and OP
     Specify messages to include in output.  Helpful if capturing specific raw data to a file.
   -->
   <Output 
-    Title="true"
-    Status="true" 
+    Title="false"
+    Status="false" 
     Headings="true" 
-    Matchups="true" 
-    IncludeCurrentRank="true" 
+    Matchups="false" 
+    IncludeCurrentRank="false" 
     RankingsAfterEachRound="false" 
-    FinalRankings="true"
-    MatchScores = "false"
+    FinalRankings="false"
+    MatchScores = "true"
     TopXStats="7" 
-    TrialStats="true" 
-    BatchStats="true" 
+    TrialStats="false" 
+    BatchStats="false" 
   />
 </Options>

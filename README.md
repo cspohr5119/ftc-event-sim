@@ -107,6 +107,8 @@ I get to it.
   TBPMethod="Expression"   // Supported values are "LosingScore", "WinningScore", "OwnScore", "TotalScore", "Expression"
   TBPExpresson="[OwnScore] + [LosingScore]" // Custom expression to calculate TBP (if TBPMethod is "Expression")
   ScoreRandomness="0.1"    // Value beteen 0 and 1 and will make score = PPM +/- (PPM * Rnd * ScoreRandomness)
+  RandomTightness="2.0"    // Tightness of the peak of the Laplace distribution
+  RandomSkew="0.8"         // Amount to skew the data.  <1.0 provides longer tails on the left of the distribution.
   Rounds="5"               // How many times each team will play in the tournament.
   Trials="1"               // Will run the same simulation n-times and will aggregate the stats
   OPRExcludesPenaltyPoints="false"  // If true, will deduct penalty points for OPR calculation
