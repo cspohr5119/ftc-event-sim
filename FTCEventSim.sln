@@ -18,6 +18,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SupportingData", "SupportingData", "{3DE48A2C-192A-46C6-9291-A01E47266FEF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RandomDistribution", "RandomDistribution", "{AB33C4B9-5D4B-455D-B0D5-86366CD285E7}"
+	ProjectSection(SolutionItems) = preProject
+		SupportingData\RandomDistribution\HistogramActual.PNG = SupportingData\RandomDistribution\HistogramActual.PNG
+		SupportingData\RandomDistribution\HistogramRandom.PNG = SupportingData\RandomDistribution\HistogramRandom.PNG
+		SupportingData\RandomDistribution\ScoresActual.txt = SupportingData\RandomDistribution\ScoresActual.txt
+		SupportingData\RandomDistribution\ScoresRandom.txt = SupportingData\RandomDistribution\ScoresRandom.txt
+		SupportingData\RandomDistribution\TestRandomDistributionActual.xml = SupportingData\RandomDistribution\TestRandomDistributionActual.xml
+		SupportingData\RandomDistribution\TestRandomDistributionRandom.xml = SupportingData\RandomDistribution\TestRandomDistributionRandom.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +55,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3DE48A2C-192A-46C6-9291-A01E47266FEF} = {DCC6D14B-B572-40E3-9D79-953FFFEAAAB1}
+		{AB33C4B9-5D4B-455D-B0D5-86366CD285E7} = {3DE48A2C-192A-46C6-9291-A01E47266FEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4ADC8DB-C03D-45C8-AD56-51351A28E2CA}
