@@ -28,7 +28,7 @@ These options will run an theoretical event with a provided list of teams and OP
   TBPMethod="Expression" 
   TBPExpression="[LosingScore] + [OwnScore]"
   ScoreRandomness="0"
-  RandomTightness="2.0"
+  RandomTightness="1.8"
   RandomSkew="0.8"
   Rounds="9" 
   Trials="1"

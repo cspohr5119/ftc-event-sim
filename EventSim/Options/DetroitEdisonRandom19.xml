@@ -27,7 +27,7 @@ Ranking should be similarly problematic as actual results, but will vary due to 
   TeamPPMFile=""
   DataFilesFolder="DataFiles"
   SchedulingModel="RandomScheduling" 
-  TBPMethod="Expression" 
+  TBPMethod="LosingScore" 
   TBPExpression="([OwnScore] + [LosingScore] / 2)"
   ScoreRandomness="0" 
   RandomTightness="1.8"
@@ -37,7 +37,7 @@ Ranking should be similarly problematic as actual results, but will vary due to 
   OPRExcludesPenaltyPoints="false"
   OPRmmse="0">
   <RandomScheduling 
-    UseFTCSchedule="true" 
+    UseFTCSchedule="false" 
     UseFTCResults="false" 
   />
 

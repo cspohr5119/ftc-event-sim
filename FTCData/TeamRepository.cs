@@ -92,6 +92,7 @@ namespace FTCData
                 team.HasOpposed.Clear();
                 team.Scheduled = 0;
                 team.Played = 0;
+                team.ScheduleDifficulty = 0;
             }
         }
     }

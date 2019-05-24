@@ -8,6 +8,7 @@ namespace FTCData.Models
         private readonly string _name;
         private readonly Dictionary<int, Team> _hasAlignedWith;
         private readonly Dictionary<int, Team> _hasOpposed;
+        private readonly Dictionary<int, int> _rankProgression;
 
         public Team(int Number, string Name)
         {
@@ -15,6 +16,7 @@ namespace FTCData.Models
             _name = Name;
             _hasAlignedWith = new Dictionary<int, Team>();
             _hasOpposed = new Dictionary<int, Team>();
+            _rankProgression = new Dictionary<int, int>();
         }
 
         public int Number => _number;
@@ -32,5 +34,7 @@ namespace FTCData.Models
         public int OPRRank { get; set; }
         public int OPRRankDifference { get; set; }
         public int PPMRankDifference { get; set; }
+        public decimal ScheduleDifficulty { get; set; }
+        public Dictionary<int, int> RankProgression => _rankProgression;
     }
 }

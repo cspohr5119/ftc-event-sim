@@ -109,6 +109,8 @@ namespace FTCData.Models
             public bool TrialStats = true;
             [XmlAttribute]
             public bool BatchStats = true;
+            [XmlAttribute]
+            public bool RankProgression = false;
         }
     }
 }

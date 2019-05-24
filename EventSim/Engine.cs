@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using FTCData;
 using FTCData.Models;
 using OPR;
@@ -104,16 +105,24 @@ namespace EventSim
             var matches = new Dictionary<int, Match>();
 
             _output.WriteStatus("Scheduling " + _options.Rounds + " random rounds");
-            _scheduler.AddNextRoundMatchesRandom(_options.Rounds, matches, teams);
 
-            _output.WriteStatus("Setting match results for all rounds");
-            _matchRepo.SetMatchResultsFromPPM(matches);
+            SetInitialRankingByPPM(teams);
+            for (int round = 1; round <= _options.Rounds; round++)
+            {
+                _output.WriteStatus("Scheduling Round " + round + " randomly");
+                _scheduler.AddNextRoundMatchesRandom(1, matches, teams);
+                _output.WriteStatus("Setting match results for round " + round);
+                _matchRepo.SetMatchResultsFromPPM(matches);
+                WriteMatchScores(matches);
+                _matchRepo.SetRankings(matches, teams, _options.TBPMethod, round);
+                WriteRankings(teams, _options.Output.RankingsAfterEachRound);
+            }
 
             _output.WriteStatus("Generating ranking");
-            _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
             WriteRankings(teams, _options.Output.FinalRankings);
 
             WriteMatchScores(matches);
+            WriteRankProgression(teams);
 
             _output.WriteStatus("Generating event stats");
             var eventStats = _matchRepo.GetEventStats(teams, matches, _options.Output.TopXStats);
@@ -124,13 +133,19 @@ namespace EventSim
 
         public EventStats RunActual(IDictionary<int, Team> teams, IDictionary<int, Match> matches)
         {
-            _output.WriteHeading("Running actual FTC event from matches and results");
- 
+            _output.WriteStatus("Running actual FTC event from matches and results");
             _output.WriteStatus("Generating Ranking");
-            _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
+
+            SetInitialRankingByPPM(teams);
+            for (int round = 1; round <= _options.Rounds; round++)
+            {
+                _matchRepo.SetRankings(matches, teams, _options.TBPMethod, round);
+            }
+
             WriteRankings(teams, _options.Output.FinalRankings);
 
             WriteMatchScores(matches);
+            WriteRankProgression(teams);
 
             _output.WriteStatus("Generating event stats");
             var eventStats = _matchRepo.GetEventStats(teams, matches, _options.Output.TopXStats);
@@ -149,7 +164,7 @@ namespace EventSim
             List<int> breaksAfter;
 
             // Set initial ranks for seeded start (will not be used if Random start)
-            SetRankingByPPM(teams);
+            SetInitialRankingByPPM(teams);
 
             // Get list of last match for each day
             _output.WriteStatus("Breaks after " + _options.SwissScheduling.BreaksAfter);
@@ -211,8 +226,8 @@ namespace EventSim
                     _matchRepo.SetMatchResultsFromPPM(matches, playingRound);
 
                     // Set the rankings
-                    _matchRepo.SetRankings(matches, teams, _options.TBPMethod);
-                    _output.WriteStatus("Generating Rankings");
+                    _output.WriteStatus("Generating Rankings after round " + playingRound);
+                    _matchRepo.SetRankings(matches, teams, _options.TBPMethod, playingRound);
                     WriteRankings(teams, _options.Output.RankingsAfterEachRound);
 
                     // Schedule upcoming matches...
@@ -241,6 +256,7 @@ namespace EventSim
             WriteRankings(teams, _options.Output.FinalRankings);
 
             WriteMatchScores(matches);
+            WriteRankProgression(teams);
 
             // Populate the event stats
             _output.WriteStatus("Generating event stats");
@@ -250,7 +266,7 @@ namespace EventSim
             return eventStats;
         }
 
-        public void SetRankingByPPM(IDictionary<int, Team> teams)
+        public void SetInitialRankingByPPM(IDictionary<int, Team> teams)
         {
             _teamRepo.ClearTeamStats(teams);
 
@@ -260,6 +276,7 @@ namespace EventSim
             {
                 team.Rank = rank;
                 team.PPMRank = rank;
+                team.RankProgression.Add(0, rank);
                 rank++;
             }
         }
@@ -296,6 +313,32 @@ namespace EventSim
             return matches;
         }
 
+        private void WriteRankProgression(IDictionary<int, Team> teams)
+        {
+            if (!_options.Output.RankProgression)
+                return;
+
+            _output.WriteHeading("Match Progression");
+
+            var sb = new StringBuilder();
+            sb.Append("Round");
+            foreach(var team in teams.Values.OrderBy(t => t.Number))
+            {
+                sb.Append("\t" + team.Number);
+            }
+            _output.WriteLine(sb.ToString(), true);
+
+            for (int round = 0; round <= _options.Rounds; round++)
+            {
+                sb.Clear();
+                sb.Append(round);
+                foreach (var team in teams.Values.OrderBy(t => t.Number))
+                {
+                    sb.Append("\t" + team.RankProgression[round]);
+                }
+                _output.WriteLine(sb.ToString(), true);
+            }
+        }
         private void WriteRankings(IDictionary<int, Team> teams, bool writeIt)
         {
             if (!writeIt)
@@ -303,10 +346,10 @@ namespace EventSim
 
             _output.WriteHeading("Results with TBP = " + _options.TBPMethod);
 
-            _output.WriteHeading("Rank\tNumber\tPPM\tRP\tTBP\tOPR\tOPRRank\tOPRDif\tPPMRank\tPPMDif");
+            _output.WriteHeading("Rank\tNumber\tPPM\tRP\tTBP\tOPR\tOPRRank\tOPRDif\tPPMRank\tPPMDif\tDfclty");
             foreach (var team in teams.Values.OrderBy(t => t.Rank))
             {
-                _output.WriteLine(string.Format("{0}\t{1}\t{2:0.0}\t{3}\t{4}\t{5:0.0}\t{6}\t{7}\t{8}\t{9}", 
+                _output.WriteLine(string.Format("{0}\t{1}\t{2:0.0}\t{3}\t{4}\t{5:0.0}\t{6}\t{7}\t{8}\t{9}\t{10:0}", 
                     team.Rank, 
                     team.Number, 
                     team.PPM, 
@@ -316,7 +359,8 @@ namespace EventSim
                     team.OPRRank, 
                     team.OPRRankDifference, 
                     team.PPMRank,
-                    team.PPMRankDifference), true);
+                    team.PPMRankDifference,
+                    team.ScheduleDifficulty), true);
             }
         }
 

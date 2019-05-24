@@ -67,6 +67,12 @@ namespace FTCData
                 }
             }
 
+            int matchesPerRound = matches.Count / _options.Rounds;
+            foreach (Match match in matches.Values)
+            {
+                match.Round = (match.MatchNumber - 1) / matchesPerRound + 1;
+            }
+
             return matches;
         }
 
@@ -160,7 +166,7 @@ namespace FTCData
             return (int)Math.Round(score, 0);
         }
 
-        public void SetRankings(IDictionary<int, Match> matches, IDictionary<int, Team> teams, string tbpMethod)
+        public void SetRankings(IDictionary<int, Match> matches, IDictionary<int, Team> teams, string tbpMethod, int round = -1)
         {
             var oprCalculater = new OPRHelper(_options);
 
@@ -170,10 +176,8 @@ namespace FTCData
                 ClearTeamStats(item.Value);
             }
 
-            foreach (var item in matches.Where(m => m.Value.Played == true))
+            foreach (var match in matches.Values.Where(m => m.Played == true && m.Round <= round))
             {
-                var match = item.Value;
-
                 if (match.RedScore > match.BlueScore)
                 {
                     // red wins
@@ -206,17 +210,27 @@ namespace FTCData
                 match.Red2.Played++;
                 match.Blue1.Played++;
                 match.Blue2.Played++;
+
+                // set match difficulty
+                match.Red1.ScheduleDifficulty += match.Blue1.PPM + match.Blue2.PPM - match.Red2.PPM;
+                match.Red2.ScheduleDifficulty += match.Blue1.PPM + match.Blue2.PPM - match.Red1.PPM;
+                match.Blue1.ScheduleDifficulty += match.Red1.PPM + match.Red2.PPM - match.Blue2.PPM;
+                match.Blue2.ScheduleDifficulty += match.Red1.PPM + match.Red2.PPM - match.Blue1.PPM;
             }
 
             // Set Rank values
             int rank = 1;
-            foreach (var item in teams.OrderByDescending(t => t.Value.RP).ThenByDescending(t => t.Value.TBP))
+            foreach (var team in teams.Values.OrderByDescending(t => t.RP).ThenByDescending(t => t.TBP))
             {
-                item.Value.Rank = rank++;
+                team.Rank = rank;
+                if (round > -1)
+                    team.RankProgression[round] = rank;
+                rank++;
             }
 
             // Set CurrentOPR
             var _oprHelper = new OPRHelper(_options);
+            Dictionary<int, Match> roundMatches = matches.Where(m => m.Value.Round <= round).ToDictionary(m => m.Key, m => m.Value);
             _oprHelper.SetTeamsOPR(teams, "CurrentOPR", matches);
 
             // Set PPM Rank and Variance
@@ -309,6 +323,7 @@ namespace FTCData
             team.RP = 0;
             team.TBP = 0;
             team.Rank = 0;
+            team.ScheduleDifficulty = 0;
         }
 
         public EventStats GetEventStats(IDictionary<int, Team> teams, IDictionary<int, Match> matches, int topX)

@@ -37,18 +37,17 @@ namespace FTCData
         {
             int matchNumber = 1;
             if (matches.Count > 0)
-                matchNumber = matches.Values.Max(m => matchNumber) + 1;
+                matchNumber = matches.Values.Max(m => m.MatchNumber) + 1;
             return matchNumber;
         }
 
         public int AddNextRoundMatchesRandom(int roundsToAdd, IDictionary<int, Match> existingMatches, IDictionary<int, Team> teams)
         {
             // returns number of last round
-            var matches = new Dictionary<int, Match>(existingMatches);
-            int nextRound = GetNextRoundNumber(matches);
-            int nextMatchNumber = GetNextMatchNumber(matches);
+            var matches = new Dictionary<int, Match>();
+            int nextRound = GetNextRoundNumber(existingMatches);
+            int matchNumber = GetNextMatchNumber(existingMatches);
             int lastRound = nextRound + roundsToAdd - 1;
-            int matchNumber = 1;
             int tries = 0;
 
             if (nextRound == 1)

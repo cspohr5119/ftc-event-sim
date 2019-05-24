@@ -72,5 +72,6 @@ Rankings should be the same as the offical rankings
     TopXStats="6" 
     TrialStats="true" 
     BatchStats="true" 
+    RankProgression="true"
   />
 </Options>
