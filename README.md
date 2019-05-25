@@ -142,6 +142,7 @@ I get to it.
     TrialStats="true"               // Stats for each trial
     BatchStats="true"               // Aggregated stats (sums and averages across multiple trials in a batch)
     Title="true"                    // Show Title value from the optons at start of run
+	RankProgression="true"          // Show teams' ranks after each round
 ~~~~
 
 ## Simulated Rankings
@@ -149,17 +150,17 @@ The following is a partial listing of a ranking report the simulator generates a
 See the Stats section below for some definitions.
 
 ~~~~
-Rank    Number  PPM     RP      TBP     OPR     OPRRank OPRDif  PPMRank PPMDif
-1       6929    317.4   16      8083    317.4   1       0       1       0
-2       10337   315.7   14      8297    315.7   2       0       2       0
-3       9441    297.4   14      8183    297.6   3       0       3       0
-4       11089   287.0   14      7626    286.9   4       0       4       0
-5       12670   282.8   14      7384    282.7   5       0       5       0
-6       10641   261.7   14      7182    261.5   9       3       9       3
-7       12808   265.2   14      6780    265.3   8       1       8       1
-8       5214    245.3   12      6812    245.3   10      2       10      2
-9       5667    245.1   12      6660    245.3   11      2       11      2
-10      5220    232.8   12      6512    232.7   13      3       13      3
+Rank    Number  PPM     RP      TBP     OPR     OPRRank OPRDif  PPMRank PPMDif Difclty
+1       6929    317.4   16      8083    317.4   1       0       1       0      2342
+2       10337   315.7   14      8297    315.7   2       0       2       0      3221
+3       9441    297.4   14      8183    297.6   3       0       3       0      4332
+4       11089   287.0   14      7626    286.9   4       0       4       0      1743
+5       12670   282.8   14      7384    282.7   5       0       5       0      1341
+6       10641   261.7   14      7182    261.5   9       3       9       3      2323
+7       12808   265.2   14      6780    265.3   8       1       8       1      1664
+8       5214    245.3   12      6812    245.3   10      2       10      2      1344
+9       5667    245.1   12      6660    245.3   11      2       11      2      3322
+10      5220    232.8   12      6512    232.7   13      3       13      3      2232
 ...
 ~~~~
 
@@ -194,6 +195,8 @@ Teams   Matches High    Low     Avg     OPRDif  TopX    TopXDif OPRTopX PPMTopX
 
 **PPMTopX** is the number of top teams by PPM in the top ranks.
 
+**Difclty** is the team's schedule difficulty, calculated as sum of (Opponents OPR - Partners OPR)
+
 Diffs are how many places "off" the actual rank is. -8 means a team ended with a rank 8 places
 below (or worse than) where they would have been if ranked by OPR.
 
@@ -203,6 +206,8 @@ results, estimating teams' average points per match from alliance totals.  These
 in fact, virtually equal if there is no randomness applied.
 
 ## Change Log
+5/24/2019 Added support for Rank Progression and Difficulty scores.
+
 5/18/2019 Added support for Laplace distribution in ScoreRandomness.  Studing real event data, the random distribution
 seemed to follow this type of curve.  Tighness and skew are also controlled by values in the options file.
 
