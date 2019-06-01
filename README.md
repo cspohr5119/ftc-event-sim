@@ -104,10 +104,11 @@ I get to it.
   TeamPPMFile=""		   // Relative path to a file of TeamNumber,PPM (points per match) to load instead of EventKey.
   DataFilesFolder="DataFiles"  // Relative path to a folder containing download files from TOA.
   SchedulingModel="SwissScheduling"  // Supported values are "SwissScheduling", "RandomScheduling"
-  TBPMethod="Expression"   // Supported values are "LosingScore", "WinningScore", "OwnScore", "TotalScore", "Expression"
+  TBPMethod="Expression"   // Supported values are [LosingScore], [WinningScore], [OwnScore], [TotalScore], [Expression], [TotalScore], Top(n, [Score])
   TBPExpresson="[OwnScore] + [LosingScore]" // Custom expression to calculate TBP (if TBPMethod is "Expression")
-  ScoreRandomness="0.1"    // Value beteen 0 and 1 and will make score = PPM +/- (PPM * Rnd * ScoreRandomness)
-  RandomTightness="2.0"    // Tightness of the peak of the Laplace distribution
+  RPExpression="[Win] * 2 + [Tie] * 1"  // Custom expression to calculate RP
+  ScoreRandomness="0.95"    // Value beteen 0 and 1 and will make score = PPM +/- (PPM * Rnd * ScoreRandomness)
+  RandomTightness="1.8"    // Tightness of the peak of the Laplace distribution
   RandomSkew="0.8"         // Amount to skew the data.  <1.0 provides longer tails on the left of the distribution.
   Rounds="5"               // How many times each team will play in the tournament.
   Trials="1"               // Will run the same simulation n-times and will aggregate the stats
@@ -171,8 +172,8 @@ in simulated matches.
 
 Sample output:
 ~~~~
-Teams   Matches High    Low     Avg     OPRDif  TopX    TopXDif OPRTopX PPMTopX
-64      144     583     87      536.47  5.22    7       0.57    5       5
+Teams   Matches High    Low     Avg     OPRDif  TopX    TopXDif OPRTopX PPMTopX OPRErr  TOPRErr OPRCor  TOPRCor
+64      144     583     87      536.47  5.22    7       0.57    5       5       27      21      0.31    0.27
 ~~~~
 
 **Teams** is the number of teams in the event.
@@ -195,7 +196,15 @@ Teams   Matches High    Low     Avg     OPRDif  TopX    TopXDif OPRTopX PPMTopX
 
 **PPMTopX** is the number of top teams by PPM in the top ranks.
 
-**Difclty** is the team's schedule difficulty, calculated as sum of (Opponents OPR - Partners OPR)
+**OPRErr** is the average diffifference between an OPRRanked team and a team of equal Rank.
+
+**TOPRErr** is the same, but limited to the Top X ranked teams.
+
+**OPRCor** is the Spearman correlation between teams' OPR values and their final qualifier rank.
+Ranges from -1.0 to 1.0.  1.0 is a perfect correlation and perfectly ranked by OPR values.
+See [Spearman's rank correlation coefficient](https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient)
+
+**TOPRCor** is the same, but for TopX ranked teams.
 
 Diffs are how many places "off" the actual rank is. -8 means a team ended with a rank 8 places
 below (or worse than) where they would have been if ranked by OPR.

@@ -46,7 +46,7 @@ namespace EventSim
                     engine = new Engine(options);
                     engine.Output.WriteStatus("Loaded optionsFile " + args[0]);
 
-                    Console.WriteLine("Error reading options file {0}\r{1}", args[0], ex.Message);
+                    Console.WriteLine("Error reading options file {0}\r\n{1}", args[0], ex.Message);
                     Console.WriteLine("Using internal defaults.");
                 }
             }

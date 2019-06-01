@@ -14,5 +14,9 @@
         public int TopPPMInTopRank = 0;
         public decimal AvgTopXOPRRankDifference = 0m;
         public decimal AvgTopXPPMRankDifference = 0m;
+        public decimal AvgOPRRankErr = 0m;
+        public decimal AvgTopXOPRRankErr = 0m;
+        public double OPRRankCorrelation = 0d;
+        public double TopXOPRRankCorrelation = 0d;
     }
 }

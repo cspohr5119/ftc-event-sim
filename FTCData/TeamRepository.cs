@@ -93,6 +93,7 @@ namespace FTCData
                 team.Scheduled = 0;
                 team.Played = 0;
                 team.ScheduleDifficulty = 0;
+                team.RankProgression.Clear();
             }
         }
     }

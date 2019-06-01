@@ -8,15 +8,15 @@ using System.Web.Script.Serialization;
 using System.Configuration;
 using NCalc;
 using MathNet.Numerics.Distributions;
-
+using MathNet.Numerics.Statistics;
 namespace FTCData
 {
     public class MatchRepository
     {
         private readonly Options _options;
         private readonly Laplace _laplace;
-
-        private Expression _expr = null;
+        private Expression _tbpExpr = null;
+        private Expression _rpExpr = null;
 
 
         public MatchRepository(Options options)
@@ -178,32 +178,16 @@ namespace FTCData
 
             foreach (var match in matches.Values.Where(m => m.Played == true && m.Round <= round))
             {
-                if (match.RedScore > match.BlueScore)
-                {
-                    // red wins
-                    match.Red1.RP += 2;
-                    match.Red2.RP += 2;
-                }
-                else if (match.RedScore < match.BlueScore)
-                {
-                    // blue wins
-                    match.Blue1.RP += 2;
-                    match.Blue2.RP += 2;
-                }
-                else
-                {
-                    // tie
-                    match.Red1.RP++;
-                    match.Red2.RP++;
-                    match.Blue1.RP++;
-                    match.Blue2.RP++;
-                }
+                match.Red1.RP += CalculateRP(match.Red1, match);
+                match.Red2.RP += CalculateRP(match.Red2, match);
+                match.Blue1.RP += CalculateRP(match.Blue1, match);
+                match.Blue2.RP += CalculateRP(match.Blue2, match);
 
                 // add tie breaker points
-                match.Red1.TBP += CalculateTBP(match.Red1, match);
-                match.Red2.TBP += CalculateTBP(match.Red2, match);
-                match.Blue1.TBP += CalculateTBP(match.Blue1, match);
-                match.Blue2.TBP += CalculateTBP(match.Blue2, match);
+                match.Red1.TBP = CalculateTBP(match.Red1, match, matches);
+                match.Red2.TBP = CalculateTBP(match.Red2, match, matches);
+                match.Blue1.TBP = CalculateTBP(match.Blue1, match, matches);
+                match.Blue2.TBP = CalculateTBP(match.Blue2, match, matches);
 
                 // increment play counts
                 match.Red1.Played++;
@@ -250,7 +234,71 @@ namespace FTCData
             }
         }
 
-        public int CalculateTBP(Team team, Match match)
+        public int CalculateRP(Team team, Match match)
+        {
+            bool isRed = (team == match.Red1 || team == match.Red2);
+
+            int redPPScore = match.RedScore - match.RedPenaltyBonus;
+            int bluePPScore = match.BlueScore - match.BluePenaltyBonus;
+
+            int winningPPScore;
+            int losingPPScore;
+
+            int win = 0;
+            int tie = 0;
+
+            if (match.RedScore > match.BlueScore)
+            {
+                // red wins
+                winningPPScore = redPPScore;
+                losingPPScore = bluePPScore;
+                if (isRed)
+                    win = 1;
+            }
+            else if (match.RedScore < match.BlueScore)
+            {
+                // blue wins
+                winningPPScore = bluePPScore;
+                losingPPScore = redPPScore;
+                if (!isRed)
+                    win = 1;
+            }
+            else //tie
+            {
+                winningPPScore = Math.Max(redPPScore, bluePPScore);
+                losingPPScore = Math.Min(redPPScore, bluePPScore);
+                tie = 1;
+            }
+
+            int ownPPScore = 0;
+            if (isRed)
+                ownPPScore = redPPScore;
+            else
+                ownPPScore = bluePPScore;
+
+            return EvaluateRP(_options.RPExpression, winningPPScore, losingPPScore, ownPPScore, win, tie);
+        }
+
+        public int EvaluateRP(string rpExpression, int winningScore, int losingScore, int ownScore, int win, int tie)
+        {
+            var ownScores = new List<int>();
+            // Cache the expression for performance
+            if (_rpExpr == null)
+            {
+                _rpExpr = new Expression(rpExpression);
+            }
+
+            _rpExpr.Parameters["WinningScore"] = winningScore;
+            _rpExpr.Parameters["LosingScore"] = losingScore;
+            _rpExpr.Parameters["TotalScore"] = winningScore + losingScore;
+            _rpExpr.Parameters["OwnScore"] = ownScore;
+            _rpExpr.Parameters["Win"] = win;
+            _rpExpr.Parameters["Tie"] = tie;
+
+            return (int)Math.Round(Convert.ToDouble(_rpExpr.Evaluate()));
+        }
+
+        public int CalculateTBP(Team team, Match match, IDictionary<int, Match> matches)
         {
             bool isRed = (team == match.Red1 || team == match.Red2);
 
@@ -285,36 +333,75 @@ namespace FTCData
             switch (_options.TBPMethod)
             {
                 case "LosingScore":
-                    return losingPPScore;
+                    return team.TBP + losingPPScore;
 
                 case "WinningScore":
-                    return winningPPScore;
+                    return team.TBP + winningPPScore;
 
                 case "OwnScore":
-                    return ownPPScore;
+                    return team.TBP + ownPPScore;
 
                 case "TotalScore":
-                    return redPPScore + bluePPScore;
+                    return team.TBP + redPPScore + bluePPScore;
 
                 case "Expression":
-                    return EvaluateTBP(_options.TBPExpression, winningPPScore, losingPPScore, ownPPScore);
+                    return EvaluateTBP(_options.TBPExpression, winningPPScore, losingPPScore, ownPPScore, matches, team);
 
                 default:
                     throw new NotImplementedException(_options.TBPMethod + " is not a supported TBPMethod");
             }
         }
 
-        public int EvaluateTBP(string tbpExpression, int winningScore, int losingScore, int ownScore)
+        public int EvaluateTBP(string tbpExpression, int winningScore, int losingScore, int ownScore, IDictionary<int, Match> matches, Team team)
         {
+            var ownScores = new List<int>();
+            if (tbpExpression.Contains("OwnScores"))
+            {
+                ownScores = GetTeamOwnScores(matches, team.Number);
+            }
+            
             // Cache the expression for performance
-            if (_expr == null)
-                _expr = new Expression(tbpExpression);
+            if (_tbpExpr == null)
+            { 
+                _tbpExpr = new Expression(tbpExpression);
+                _tbpExpr.EvaluateFunction += delegate (string name, FunctionArgs args)
+                {
+                    if (name == "Top")
+                    {
+                        var scoresToUse = (List<int>) args.Parameters[1].Evaluate();
+                        int topScoreSum = scoresToUse.OrderByDescending(s => s).Take((int) args.Parameters[0].Evaluate()).Sum();
+                        args.Result = topScoreSum;
+                    }
+                };
+            }
 
-            _expr.Parameters["WinningScore"] = winningScore;
-            _expr.Parameters["LosingScore"] = losingScore;
-            _expr.Parameters["OwnScore"] = ownScore;
+            _tbpExpr.Parameters["WinningScore"] = winningScore;
+            _tbpExpr.Parameters["LosingScore"] = losingScore;
+            _tbpExpr.Parameters["TotalScore"] = winningScore + losingScore;
+            _tbpExpr.Parameters["OwnScore"] = ownScore;
+            _tbpExpr.Parameters["OwnScores"] = ownScores;
 
-            return (int) Math.Round(Convert.ToDouble(_expr.Evaluate()));
+            if (tbpExpression.Contains("Top("))
+            {
+                // Top returns a total TBP, so don't added it to the existing TBP.  Just return the value returned;
+                return (int)Math.Round(Convert.ToDouble(_tbpExpr.Evaluate()));
+            }
+            else
+            {
+                // All other expressions return incremental TBP, so add it to existing TBP
+                return team.TBP + (int)Math.Round(Convert.ToDouble(_tbpExpr.Evaluate()));
+            }       
+        }
+
+        public List<int> GetTeamOwnScores(IDictionary<int, Match> matches, int teamNumber)
+        {
+            var ownScores = matches.Values.Where(m => m.Red1.Number == teamNumber || m.Red2.Number == teamNumber)
+                .Select(m => m.RedScore - m.RedPenaltyBonus).ToList();
+
+            ownScores.AddRange(matches.Values.Where(m => m.Blue1.Number == teamNumber || m.Blue2.Number == teamNumber)
+                .Select(m => m.BlueScore - m.BluePenaltyBonus).ToList());
+
+            return ownScores;
         }
 
         public void ClearTeamStats(Team team)
@@ -329,9 +416,6 @@ namespace FTCData
         public EventStats GetEventStats(IDictionary<int, Team> teams, IDictionary<int, Match> matches, int topX)
         {
             var sortedTeams = teams.Values.OrderBy(t => t.Rank).ToList();
-
-
-
 
             var eventStats = new EventStats
             {
@@ -349,16 +433,61 @@ namespace FTCData
                 AvgTopXPPMRankDifference = 0
             };
 
-            // AvgTopX calculations need at least one team in the top rank to be in topX, otherwise it breaks
+            // Calculate OPRRankErr
+            decimal oprRankErrSum = 0;
+            foreach (Team team in sortedTeams)
+            {
+                // Find the team with the OPR rank equal to the current team's rank
+                Team teamToCompare = teams.Values.Where(t => t.OPRRank == team.Rank).FirstOrDefault();
+                if (teamToCompare != null)
+                    oprRankErrSum += Math.Abs(teamToCompare.CurrentOPR - team.CurrentOPR);
+            }
+            // Average over number of teams
+            eventStats.AvgOPRRankErr = oprRankErrSum / teams.Count();
 
+            // Calculate TopXOPRRankErr
+            decimal topXOprRankErrSum = 0;
+            foreach (Team team in sortedTeams.Take(topX))
+            {
+                // Find the team with the OPR rank equal to the current team's rank
+                Team teamToCompare = teams.Values.Where(t => t.OPRRank == team.Rank).FirstOrDefault();
+                if (teamToCompare != null)
+                    topXOprRankErrSum += Math.Abs(teamToCompare.CurrentOPR - team.CurrentOPR);
+            }
+            // Average over number of teams
+            eventStats.AvgTopXOPRRankErr = topXOprRankErrSum / teams.Count();
+
+            // AvgTopX calculations need at least one team in the top rank to be in topX, otherwise it breaks
             if (eventStats.TopOPRInTopRank > 0)
                 eventStats.AvgTopXOPRRankDifference = (decimal)sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.OPRRankDifference));
 
             if (eventStats.TopPPMInTopRank > 0)
                 eventStats.AvgTopXPPMRankDifference = (decimal)sortedTeams.Where(t => t.Rank <= topX).Average(t => Math.Abs(t.PPMRankDifference));
 
+            // Rank Correlation
+            eventStats.OPRRankCorrelation = Correlation.Spearman(teams.Values
+                                                                                .OrderByDescending(m => m.Rank)
+                                                                                .Select(m => (double) m.CurrentOPR).ToList(),
+                                                                           teams.Values
+                                                                                .OrderByDescending(m => m.Rank)
+                                                                                .Select(m => (double) matches.Count - m.Rank).ToList());
+
+            eventStats.TopXOPRRankCorrelation = Correlation.Spearman(teams.Values.Where(m => m.Rank <= topX)
+                                                                                .OrderByDescending(m => m.Rank)
+                                                                                .Select(m => (double) m.CurrentOPR).ToList(),
+                                                                           teams.Values.Where(m => m.Rank <= topX)
+                                                                                .OrderByDescending(m => m.Rank)
+                                                                                .Select(m => (double) matches.Count - m.Rank).ToList());
+
+            if (double.IsNaN(eventStats.OPRRankCorrelation))
+                eventStats.OPRRankCorrelation = 0d;
+
+            if (double.IsNaN(eventStats.TopXOPRRankCorrelation))
+                eventStats.TopXOPRRankCorrelation = 0d;
+
             return eventStats;
         }
+
         public BatchStats GetBatchStats(IList<EventStats> eventStatsList)
         {
             var batchStats = new BatchStats
@@ -374,7 +503,11 @@ namespace FTCData
                 TopX = eventStatsList[0].TopX,
                 AvgTopOPRInTopRank = (decimal) eventStatsList.Average(e => e.TopOPRInTopRank),
                 AvgTopXOPRRankDifference = eventStatsList.Average(e => e.AvgTopXOPRRankDifference),
-                AvgTopPPMInTopRank = (decimal) eventStatsList.Average(e => e.TopPPMInTopRank)
+                AvgTopPPMInTopRank = (decimal) eventStatsList.Average(e => e.TopPPMInTopRank),
+                AvgOPRRankErr = (decimal) eventStatsList.Average(e => e.AvgOPRRankErr),
+                AvgTopXOPRRankErr = (decimal) eventStatsList.Average(e => e.AvgTopXOPRRankErr),
+                OPRRankCorrelation = eventStatsList.Average(e => e.OPRRankCorrelation),
+                TopXOPRRankCorrelation = eventStatsList.Average(e => e.TopXOPRRankCorrelation)
             };
 
             return batchStats;

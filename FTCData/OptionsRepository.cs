@@ -30,7 +30,7 @@ namespace FTCData
         {
             // Set any option value from a string expression
             // in the format of "OptionItem=value"
-            // Supports dotted options such as "Output.Headers=false"
+            // Supports dotted options such as "Output.Headings=false"
 
             foreach (string arg in args)
             { 
@@ -46,7 +46,7 @@ namespace FTCData
                 var nameParts = name.Split('.');
                 if (nameParts.Length == 2)
                 {
-                    obj = options.GetType().GetProperty(nameParts[0]).GetValue(options);
+                    obj = options.GetType().GetField(nameParts[0]).GetValue(options);
                     prop = obj.GetType().GetField(nameParts[1]);
                 }
                 else

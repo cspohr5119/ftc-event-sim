@@ -77,8 +77,6 @@ namespace EventSim
 
         public EventStats RunSimulation(IDictionary<int, Team> teams, IDictionary<int, Match> matches = null)
         {
-            var eventStats = new EventStats();
-
             // Check if we have matches if required
             if (_options.RandomScheduling.UseFTCResults && matches == null)
                 throw new InvalidOperationException("Matches must be provided if using RandomScheduling.UseFTCResults");
@@ -369,9 +367,9 @@ namespace EventSim
             if (!_options.Output.TrialStats)
                 return;
 
-            _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tOPRDif\tTopX\tTopXDif\tOPRTopX\tPPMTopX");
+            _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tOPRDif\tTopX\tTopXDif\tOPRTopX\tPPMTopX\tOPRErr\tTOPRErr\tOPRCor\tTOPRCor");
             _output.WriteLine(String.Format(
-                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8}\t{9}",
+                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8}\t{9}\t{10:0.0}\t{11:0.0}\t{12:0.00}\t{13:0.00}",
                 eventStats.TeamCount,
                 eventStats.MatchCount,
                 eventStats.HighScore,
@@ -381,7 +379,11 @@ namespace EventSim
                 eventStats.TopX,
                 eventStats.AvgTopXOPRRankDifference,
                 eventStats.TopOPRInTopRank,
-                eventStats.TopPPMInTopRank
+                eventStats.TopPPMInTopRank,
+                eventStats.AvgOPRRankErr,
+                eventStats.AvgTopXOPRRankErr,
+                eventStats.OPRRankCorrelation,
+                eventStats.TopXOPRRankCorrelation
                 ), true);
         }
 
@@ -390,9 +392,9 @@ namespace EventSim
             if (!_options.Output.BatchStats)
                 return;
 
-            _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tOPRDif\tTopX\tTopXDif\tOPRTopX\tPPMTopX\tTrials");
+            _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tOPRDif\tTopX\tTopXDif\tOPRTopX\tPPMTopX\tTrials\tOPRErr\tTOPRErr\tOPRCor\tTOPRCor");
             _output.WriteLine(String.Format(
-                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8:0.00}\t{9}\t{10}",
+                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8:0.00}\t{9}\t{10}\t{11:0.0}\t{12:0.0}\t{13:0.00}\t{14:0.00}",
                 eventStats.TeamCount,
                 eventStats.MatchCount,
                 eventStats.HighScore,
@@ -403,7 +405,11 @@ namespace EventSim
                 eventStats.AvgTopXOPRRankDifference,
                 eventStats.AvgTopOPRInTopRank,
                 eventStats.AvgTopPPMInTopRank,
-                eventStats.EventCount
+                eventStats.EventCount,
+                eventStats.AvgOPRRankErr,
+                eventStats.AvgTopXOPRRankErr,
+                eventStats.OPRRankCorrelation,
+                eventStats.TopXOPRRankCorrelation
                 ), true);
         }
 
