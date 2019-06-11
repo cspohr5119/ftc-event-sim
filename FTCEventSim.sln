@@ -63,6 +63,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{1AF80D
 		SupportingData\Images\Detroit Edison 2019 TBP OwnScore OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 TBP OwnScore OPR vs Rank.png
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PDF", "PDF", "{4FEABADA-B385-4EEF-8DA4-1A8D22422393}"
+	ProjectSection(SolutionItems) = preProject
+		SupportingData\PDF\On Improving Ranking in FTC.pdf = SupportingData\PDF\On Improving Ranking in FTC.pdf
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +99,7 @@ Global
 		{AB33C4B9-5D4B-455D-B0D5-86366CD285E7} = {3DE48A2C-192A-46C6-9291-A01E47266FEF}
 		{0D4F9E94-80D8-4927-B2D1-DD90F34F08AE} = {3DE48A2C-192A-46C6-9291-A01E47266FEF}
 		{1AF80D78-CE1E-4263-8E78-8DCDB472B3F4} = {3DE48A2C-192A-46C6-9291-A01E47266FEF}
+		{4FEABADA-B385-4EEF-8DA4-1A8D22422393} = {3DE48A2C-192A-46C6-9291-A01E47266FEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4ADC8DB-C03D-45C8-AD56-51351A28E2CA}
