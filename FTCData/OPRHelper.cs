@@ -45,18 +45,22 @@ namespace FTCData
             {
                 int teamNumber = teamList[i];
                 var team = teams[teamNumber];
+                decimal value;
+                try
+                {
+                    // sometimes these are NaN.  Not sure why.
+                    value = (decimal)oprArray[i];
+                }
+                catch
+                {
+                    value = -1m;
+                }
+
                 if (propertyName == "PPM")
-                    team.PPM = (decimal)oprArray[i];
+                    team.PPM = value;
                 else
-                    try
-                    {
-                        // sometimes these are NaN.  Not sure why.
-                        team.CurrentOPR = (decimal)oprArray[i];
-                    }
-                    catch
-                    {
-                        team.CurrentOPR = -1;
-                    }
+                    team.CurrentOPR = value;
+                
             }
         }
 

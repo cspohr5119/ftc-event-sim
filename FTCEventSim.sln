@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StudyOptionFiles", "StudyOp
 		SupportingData\StudyOptionFiles\DetEdRandomRankings.xml = SupportingData\StudyOptionFiles\DetEdRandomRankings.xml
 		SupportingData\StudyOptionFiles\DetEdSwiss.xml = SupportingData\StudyOptionFiles\DetEdSwiss.xml
 		SupportingData\StudyOptionFiles\DetEdSwissOwnPlusLosingTBP.xml = SupportingData\StudyOptionFiles\DetEdSwissOwnPlusLosingTBP.xml
+		SupportingData\StudyOptionFiles\DetroitEdisonActual19.xml = SupportingData\StudyOptionFiles\DetroitEdisonActual19.xml
 		SupportingData\StudyOptionFiles\DetroitEdisonRandom19.xml = SupportingData\StudyOptionFiles\DetroitEdisonRandom19.xml
 		SupportingData\StudyOptionFiles\DetroitEdisonSwiss19.xml = SupportingData\StudyOptionFiles\DetroitEdisonSwiss19.xml
 		SupportingData\StudyOptionFiles\HouJemActualRankings.xml = SupportingData\StudyOptionFiles\HouJemActualRankings.xml
@@ -48,6 +49,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StudyOptionFiles", "StudyOp
 		SupportingData\StudyOptionFiles\HouJemRandomRankings.xml = SupportingData\StudyOptionFiles\HouJemRandomRankings.xml
 		SupportingData\StudyOptionFiles\HouJemSwiss.xml = SupportingData\StudyOptionFiles\HouJemSwiss.xml
 		SupportingData\StudyOptionFiles\HouJemSwissOwnPlusLosingTBP.xml = SupportingData\StudyOptionFiles\HouJemSwissOwnPlusLosingTBP.xml
+		SupportingData\StudyOptionFiles\RPStudy.xml = SupportingData\StudyOptionFiles\RPStudy.xml
+		SupportingData\StudyOptionFiles\SwissStudy.xml = SupportingData\StudyOptionFiles\SwissStudy.xml
+		SupportingData\StudyOptionFiles\TBPStudy.xml = SupportingData\StudyOptionFiles\TBPStudy.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{1AF80D78-CE1E-4263-8E78-8DCDB472B3F4}"
+	ProjectSection(SolutionItems) = preProject
+		SupportingData\Images\Detroit Edison 2019 Actual OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 Actual OPR vs Rank.png
+		SupportingData\Images\Detroit Edison 2019 FTC-Modified Swiss Scheduling OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 FTC-Modified Swiss Scheduling OPR vs Rank.png
+		SupportingData\Images\Detroit Edison 2019 RP OwnScore OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 RP OwnScore OPR vs Rank.png
+		SupportingData\Images\Detroit Edison 2019 Straight Swiss Scheduling OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 Straight Swiss Scheduling OPR vs Rank.png
+		SupportingData\Images\Detroit Edison 2019 TBP OwnScore OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 TBP OwnScore OPR vs Rank.png
 	EndProjectSection
 EndProject
 Global
@@ -80,6 +93,7 @@ Global
 		{3DE48A2C-192A-46C6-9291-A01E47266FEF} = {DCC6D14B-B572-40E3-9D79-953FFFEAAAB1}
 		{AB33C4B9-5D4B-455D-B0D5-86366CD285E7} = {3DE48A2C-192A-46C6-9291-A01E47266FEF}
 		{0D4F9E94-80D8-4927-B2D1-DD90F34F08AE} = {3DE48A2C-192A-46C6-9291-A01E47266FEF}
+		{1AF80D78-CE1E-4263-8E78-8DCDB472B3F4} = {3DE48A2C-192A-46C6-9291-A01E47266FEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4ADC8DB-C03D-45C8-AD56-51351A28E2CA}

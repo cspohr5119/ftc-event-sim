@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Xml.Serialization;
 using FTCData.Models;
@@ -61,5 +62,18 @@ namespace FTCData
                 prop.SetValue(obj, Convert.ChangeType(value, prop.FieldType));
             }
         }
+
+        public Dictionary<int, double> LoadAchievementPointTiers(string achievementPointTiersString)
+        {
+            var achievementPointTiers = new Dictionary<int, double>();
+
+            var parts = achievementPointTiersString.Split(',');
+            for (int i = 0; i < parts.Length; i += 2)
+            {
+                achievementPointTiers.Add(int.Parse(parts[i]), float.Parse(parts[i + 1]));
+            }
+            return achievementPointTiers;
+        }
+
     }
 }

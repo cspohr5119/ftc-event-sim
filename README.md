@@ -107,6 +107,9 @@ I get to it.
   TBPMethod="Expression"   // Supported values are [LosingScore], [WinningScore], [OwnScore], [TotalScore], [Expression], [TotalScore], Top(n, [Score])
   TBPExpresson="[OwnScore] + [LosingScore]" // Custom expression to calculate TBP (if TBPMethod is "Expression")
   RPExpression="[Win] * 2 + [Tie] * 1"  // Custom expression to calculate RP
+  Achievement1PointTiers="0,0.0" // Point tiers and %chance of attaining achievement #1.
+  Achievement2PointTiers="0,0.0" // Point tiers and %chance of attaining achievement #2.
+                                 // Comma-delimeted: point1,achievementChance,points2,achievementChance, etc
   ScoreRandomness="0.95"    // Value beteen 0 and 1 and will make score = PPM +/- (PPM * Rnd * ScoreRandomness)
   RandomTightness="1.8"    // Tightness of the peak of the Laplace distribution
   RandomSkew="0.8"         // Amount to skew the data.  <1.0 provides longer tails on the left of the distribution.
@@ -215,6 +218,15 @@ results, estimating teams' average points per match from alliance totals.  These
 in fact, virtually equal if there is no randomness applied.
 
 ## Change Log
+6/10/2019 Added support for achievements by specifiying point tiers and %chance of getting the achievment.
+For example, Achievement1PointTiers="0,0.0,100,0.5,200,1.0"
+would translate to: between 0 and 99 points, zero chance of getting the achievement.  100-199 gives 50% chance
+of getting the achivement. 200+ gives 100% chance of getting the achievement.
+Achievement points can be used in RPExpression.
+For example, RPExpression="[Win] * 2 + [Tie] * 1 + [Achievement1] * 1 + [Achievement2] * 1"
+
+6/10/2019 Added options files used in white paper study.
+
 5/24/2019 Added support for Rank Progression and Difficulty scores.
 
 5/18/2019 Added support for Laplace distribution in ScoreRandomness.  Studing real event data, the random distribution

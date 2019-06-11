@@ -29,6 +29,10 @@ namespace FTCData.Models
         [XmlAttribute]
         public string RPExpression = "[Win] * 2 + [Tie] * 1";
         [XmlAttribute]
+        public string Achievement1PointTiers;
+        [XmlAttribute]
+        public string Achievement2PointTiers;
+        [XmlAttribute]
         public decimal ScoreRandomness = 0;
         [XmlAttribute]
         public decimal RandomTightness = 1.8m;

@@ -17,12 +17,18 @@ namespace FTCData
         private readonly Laplace _laplace;
         private Expression _tbpExpr = null;
         private Expression _rpExpr = null;
-
+        private Dictionary<int, double> _achievement1PointTiers = null;
+        private Dictionary<int, double> _achievement2PointTiers = null;
+        private Random _rnd = new Random();
 
         public MatchRepository(Options options)
         {
             _options = options;
             _laplace = new Laplace(0.0, (double) _options.RandomTightness);
+
+            var optionsRepo = new OptionsRepository();
+            _achievement1PointTiers = optionsRepo.LoadAchievementPointTiers(_options.Achievement1PointTiers);
+            _achievement2PointTiers = optionsRepo.LoadAchievementPointTiers(_options.Achievement2PointTiers);
         }
 
         public IDictionary<int, Match> GetMatchesFromTOAFile(IDictionary<int, Team> teams, string folder, string eventKey, bool includeActualScores = false)
@@ -178,10 +184,15 @@ namespace FTCData
 
             foreach (var match in matches.Values.Where(m => m.Played == true && m.Round <= round))
             {
-                match.Red1.RP += CalculateRP(match.Red1, match);
-                match.Red2.RP += CalculateRP(match.Red2, match);
-                match.Blue1.RP += CalculateRP(match.Blue1, match);
-                match.Blue2.RP += CalculateRP(match.Blue2, match);
+                int redAchievement1 = GetAchievement(_achievement1PointTiers, match.RedScore - match.RedPenaltyBonus);
+                int redAchievement2 = GetAchievement(_achievement2PointTiers, match.RedScore - match.RedPenaltyBonus);
+                int blueAchievement1 = GetAchievement(_achievement1PointTiers, match.BlueScore - match.BluePenaltyBonus);
+                int blueAchievement2 = GetAchievement(_achievement2PointTiers, match.BlueScore - match.BluePenaltyBonus);
+
+                match.Red1.RP += CalculateRP(match.Red1, match, redAchievement1, redAchievement2);
+                match.Red2.RP += CalculateRP(match.Red2, match, redAchievement1, redAchievement2);
+                match.Blue1.RP += CalculateRP(match.Blue1, match, blueAchievement1, blueAchievement2);
+                match.Blue2.RP += CalculateRP(match.Blue2, match, blueAchievement1, blueAchievement2);
 
                 // add tie breaker points
                 match.Red1.TBP = CalculateTBP(match.Red1, match, matches);
@@ -234,7 +245,7 @@ namespace FTCData
             }
         }
 
-        public int CalculateRP(Team team, Match match)
+        public int CalculateRP(Team team, Match match, int achievement1, int achievement2)
         {
             bool isRed = (team == match.Red1 || team == match.Red2);
 
@@ -276,10 +287,24 @@ namespace FTCData
             else
                 ownPPScore = bluePPScore;
 
-            return EvaluateRP(_options.RPExpression, winningPPScore, losingPPScore, ownPPScore, win, tie);
+            return EvaluateRP(_options.RPExpression, winningPPScore, losingPPScore, ownPPScore, win, tie, achievement1, achievement2);
         }
 
-        public int EvaluateRP(string rpExpression, int winningScore, int losingScore, int ownScore, int win, int tie)
+        public int GetAchievement(IDictionary<int, double> achievementPointTiers, int score)
+        {
+            if (achievementPointTiers.Count == 0)
+                return 0;
+
+            int tierKey = achievementPointTiers.Keys.Where(k => k <= score).Max(k => k);
+            double achievementChance = achievementPointTiers[tierKey];
+
+            if (achievementChance > _rnd.NextDouble())
+                return 1;
+            else
+                return 0;
+        }
+
+        public int EvaluateRP(string rpExpression, int winningScore, int losingScore, int ownScore, int win, int tie, int achievement1, int achievement2)
         {
             var ownScores = new List<int>();
             // Cache the expression for performance
@@ -294,6 +319,8 @@ namespace FTCData
             _rpExpr.Parameters["OwnScore"] = ownScore;
             _rpExpr.Parameters["Win"] = win;
             _rpExpr.Parameters["Tie"] = tie;
+            _rpExpr.Parameters["Achievement1"] = achievement1;
+            _rpExpr.Parameters["Achievement2"] = achievement2;
 
             return (int)Math.Round(Convert.ToDouble(_rpExpr.Evaluate()));
         }
@@ -404,6 +431,16 @@ namespace FTCData
             return ownScores;
         }
 
+        public void InitializeTeams(IDictionary<int, Team> teams)
+        {
+            foreach (var team in teams.Values)
+            {
+                ClearTeamStats(team);
+                team.HasAlignedWith.Clear();
+                team.HasOpposed.Clear();
+            }
+        }
+
         public void ClearTeamStats(Team team)
         {
             team.Played = 0;
@@ -411,6 +448,9 @@ namespace FTCData
             team.TBP = 0;
             team.Rank = 0;
             team.ScheduleDifficulty = 0;
+            team.CurrentOPR = 0m;
+            team.OPRRank = 0;
+            team.OPRRankDifference = 0;
         }
 
         public EventStats GetEventStats(IDictionary<int, Team> teams, IDictionary<int, Match> matches, int topX)
@@ -502,7 +542,7 @@ namespace FTCData
                 AvgPPMRankDifference = eventStatsList.Average(e => e.AvgPPMRankDifference),
                 TopX = eventStatsList[0].TopX,
                 AvgTopOPRInTopRank = (decimal) eventStatsList.Average(e => e.TopOPRInTopRank),
-                AvgTopXOPRRankDifference = eventStatsList.Average(e => e.AvgTopXOPRRankDifference),
+                AvgTopXOPRRankDifference = (decimal) eventStatsList.Average(e => e.AvgTopXOPRRankDifference),
                 AvgTopPPMInTopRank = (decimal) eventStatsList.Average(e => e.TopPPMInTopRank),
                 AvgOPRRankErr = (decimal) eventStatsList.Average(e => e.AvgOPRRankErr),
                 AvgTopXOPRRankErr = (decimal) eventStatsList.Average(e => e.AvgTopXOPRRankErr),

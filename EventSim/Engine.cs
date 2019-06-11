@@ -80,7 +80,10 @@ namespace EventSim
             // Check if we have matches if required
             if (_options.RandomScheduling.UseFTCResults && matches == null)
                 throw new InvalidOperationException("Matches must be provided if using RandomScheduling.UseFTCResults");
-            
+
+            // Clear all teams' stats
+            _matchRepo.InitializeTeams(teams);
+
             // run scheduling-specific simulation
             switch (_options.SchedulingModel)
             {
@@ -394,7 +397,7 @@ namespace EventSim
 
             _output.WriteHeading("Teams\tMatches\tHigh\tLow\tAvg\tOPRDif\tTopX\tTopXDif\tOPRTopX\tPPMTopX\tTrials\tOPRErr\tTOPRErr\tOPRCor\tTOPRCor");
             _output.WriteLine(String.Format(
-                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8:0.00}\t{9}\t{10}\t{11:0.0}\t{12:0.0}\t{13:0.00}\t{14:0.00}",
+                "{0}\t{1}\t{2}\t{3}\t{4:0.00}\t{5:0.00}\t{6}\t{7:0.00}\t{8:0.00}\t{9:0.00}\t{10}\t{11:0.0}\t{12:0.0}\t{13:0.00}\t{14:0.00}",
                 eventStats.TeamCount,
                 eventStats.MatchCount,
                 eventStats.HighScore,

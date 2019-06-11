@@ -89,6 +89,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="DataFiles\1718-CMP-HOU2Teams.json" />
+    <None Include="DataFiles\1819-AZ-FTCAZNMDMatches.json" />
+    <None Include="DataFiles\1819-AZ-FTCAZNMDTeams.json" />
     <None Include="DataFiles\1819-CMP-DET1Matches.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -99,6 +101,12 @@
     <Content Include="DataFiles\TeamPPM36.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="DataFiles\1819-CO-FTCCOCQMatches.json" />
+    <None Include="DataFiles\1819-CO-FTCCOCQTeams.json" />
+    <None Include="DataFiles\1819-FL-SCLT1Matches.json" />
+    <None Include="DataFiles\1819-FL-SCLT1Teams.json" />
+    <None Include="DataFiles\1819-NJ-LTNJ6Matches.json" />
+    <None Include="DataFiles\1819-NJ-LTNJ6Teams.json" />
     <None Include="Properties\app.manifest" />
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +121,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Options\HoustonJemisonTop5ScoreTBP.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Options\RPStudy.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Options\SwissStudy.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Options\TBPStudy.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Options\TestRandomDistribution.xml">
