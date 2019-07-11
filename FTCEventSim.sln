@@ -56,6 +56,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StudyOptionFiles", "StudyOp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{1AF80D78-CE1E-4263-8E78-8DCDB472B3F4}"
 	ProjectSection(SolutionItems) = preProject
+		SupportingData\Images\12 Team Tournament, Percent Improvements by Rule.png = SupportingData\Images\12 Team Tournament, Percent Improvements by Rule.png
+		SupportingData\Images\16 Team Tournament, Percent Improvements by Rule.png = SupportingData\Images\16 Team Tournament, Percent Improvements by Rule.png
+		SupportingData\Images\24 Team Tournament, Percent Improvements by Rule.png = SupportingData\Images\24 Team Tournament, Percent Improvements by Rule.png
+		SupportingData\Images\32 Team Tournament, Percent Improvements by Rule.png = SupportingData\Images\32 Team Tournament, Percent Improvements by Rule.png
+		SupportingData\Images\64 Team Tournament, Percent Improvements by Rule.png = SupportingData\Images\64 Team Tournament, Percent Improvements by Rule.png
+		SupportingData\Images\80 Team Tournament, Percent Improvements by Rule.png = SupportingData\Images\80 Team Tournament, Percent Improvements by Rule.png
+		SupportingData\Images\Average Improvements Across All Events.png = SupportingData\Images\Average Improvements Across All Events.png
 		SupportingData\Images\Detroit Edison 2019 Actual OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 Actual OPR vs Rank.png
 		SupportingData\Images\Detroit Edison 2019 FTC-Modified Swiss Scheduling OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 FTC-Modified Swiss Scheduling OPR vs Rank.png
 		SupportingData\Images\Detroit Edison 2019 RP OwnScore OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 RP OwnScore OPR vs Rank.png
