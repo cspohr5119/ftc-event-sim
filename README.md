@@ -218,6 +218,10 @@ results, estimating teams' average points per match from alliance totals.  These
 in fact, virtually equal if there is no randomness applied.
 
 ## Change Log
+7/10/2019 Added support for [LosingScores] in Top() expression for TBP.  Can now calculate TBP according to the
+new 2019 rule for TBP where in a 5 match/team event, TBPExpression="Top(4, [LosingScores])".  For a 9-match/team event, use
+TBPExpression="Top(7, [LosingScores])"
+
 6/10/2019 Added support for achievements by specifiying point tiers and %chance of getting the achievment.
 For example, Achievement1PointTiers="0,0.0,100,0.5,200,1.0"
 would translate to: between 0 and 99 points, zero chance of getting the achievement.  100-199 gives 50% chance
@@ -232,7 +236,7 @@ For example, RPExpression="[Win] * 2 + [Tie] * 1 + [Achievement1] * 1 + [Achieve
 5/18/2019 Added support for Laplace distribution in ScoreRandomness.  Studing real event data, the random distribution
 seemed to follow this type of curve.  Tighness and skew are also controlled by values in the options file.
 
-5/14/2019 Added multi-day tournaments with RoundsToScheduleAtStart, ScheduleAtBreaks, BeaksAfter, ScheduleRoundsAhead,
+5/14/2019 Added multi-day tournaments with RoundsToScheduleAtStart, ScheduleAtBreaks, BeaksAfter, ScheduleRoundsAhead, 
 and StartingRoundsOpponentPairingMethod options.
 
 5/12/2019 Added first-round seeding for Swiss Tournaments.  Seed by rank based on PPM.

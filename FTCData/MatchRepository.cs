@@ -382,11 +382,18 @@ namespace FTCData
         public int EvaluateTBP(string tbpExpression, int winningScore, int losingScore, int ownScore, IDictionary<int, Match> matches, Team team)
         {
             var ownScores = new List<int>();
+            var losingScores = new List<int>();
+
             if (tbpExpression.Contains("OwnScores"))
             {
                 ownScores = GetTeamOwnScores(matches, team.Number);
             }
-            
+
+            if (tbpExpression.Contains("LosingScores"))
+            {
+                losingScores = GetTeamLosingScores(matches, team.Number);
+            }
+
             // Cache the expression for performance
             if (_tbpExpr == null)
             { 
@@ -404,6 +411,7 @@ namespace FTCData
 
             _tbpExpr.Parameters["WinningScore"] = winningScore;
             _tbpExpr.Parameters["LosingScore"] = losingScore;
+            _tbpExpr.Parameters["LosingScores"] = losingScores;
             _tbpExpr.Parameters["TotalScore"] = winningScore + losingScore;
             _tbpExpr.Parameters["OwnScore"] = ownScore;
             _tbpExpr.Parameters["OwnScores"] = ownScores;
@@ -429,6 +437,22 @@ namespace FTCData
                 .Select(m => m.BlueScore - m.BluePenaltyBonus).ToList());
 
             return ownScores;
+        }
+
+        public List<int> GetTeamLosingScores(IDictionary<int, Match> matches, int teamNumber)
+        {
+            var teamMatches = matches.Values.Where(m => m.Red1.Number == teamNumber || m.Red2.Number == teamNumber
+                                                      || m.Blue1.Number == teamNumber || m.Blue2.Number == teamNumber);
+
+            var blueWinMatches = teamMatches.Where(m => m.BlueScore > m.RedScore);
+            var redWinMatches = teamMatches.Where(m => m.RedScore > m.BlueScore);
+            var tiedMatches = teamMatches.Where(m => m.BlueScore == m.RedScore);
+
+            var teamLosingScores = blueWinMatches.Select(m => m.RedScore - m.RedPenaltyBonus).ToList();
+            teamLosingScores.AddRange(redWinMatches.Select(m => m.BlueScore - m.BluePenaltyBonus).ToList());
+            teamLosingScores.AddRange(tiedMatches.Select(m => Math.Max(m.BlueScore - m.BluePenaltyBonus, m.RedScore - m.RedPenaltyBonus)).ToList());
+
+            return teamLosingScores;
         }
 
         public void InitializeTeams(IDictionary<int, Team> teams)
