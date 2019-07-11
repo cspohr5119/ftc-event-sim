@@ -450,7 +450,7 @@ namespace FTCData
 
             var teamLosingScores = blueWinMatches.Select(m => m.RedScore - m.RedPenaltyBonus).ToList();
             teamLosingScores.AddRange(redWinMatches.Select(m => m.BlueScore - m.BluePenaltyBonus).ToList());
-            teamLosingScores.AddRange(tiedMatches.Select(m => Math.Max(m.BlueScore - m.BluePenaltyBonus, m.RedScore - m.RedPenaltyBonus)).ToList());
+            teamLosingScores.AddRange(tiedMatches.Select(m => Math.Min(m.BlueScore - m.BluePenaltyBonus, m.RedScore - m.RedPenaltyBonus)).ToList());
 
             return teamLosingScores;
         }
