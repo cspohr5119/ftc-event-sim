@@ -64,10 +64,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{1AF80D
 		SupportingData\Images\80 Team Tournament, Percent Improvements by Rule.png = SupportingData\Images\80 Team Tournament, Percent Improvements by Rule.png
 		SupportingData\Images\Average Improvements Across All Events.png = SupportingData\Images\Average Improvements Across All Events.png
 		SupportingData\Images\Detroit Edison 2019 Actual OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 Actual OPR vs Rank.png
+		SupportingData\Images\Detroit Edison 2019 DropLowest OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 DropLowest OPR vs Rank.png
 		SupportingData\Images\Detroit Edison 2019 FTC-Modified Swiss Scheduling OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 FTC-Modified Swiss Scheduling OPR vs Rank.png
 		SupportingData\Images\Detroit Edison 2019 RP OwnScore OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 RP OwnScore OPR vs Rank.png
 		SupportingData\Images\Detroit Edison 2019 Straight Swiss Scheduling OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 Straight Swiss Scheduling OPR vs Rank.png
 		SupportingData\Images\Detroit Edison 2019 TBP OwnScore OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 TBP OwnScore OPR vs Rank.png
+		SupportingData\Images\Detroit Edison 2019 TBP Rule Comparison.PNG = SupportingData\Images\Detroit Edison 2019 TBP Rule Comparison.PNG
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PDF", "PDF", "{4FEABADA-B385-4EEF-8DA4-1A8D22422393}"
