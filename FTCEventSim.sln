@@ -72,6 +72,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{1AF80D
 		SupportingData\Images\Detroit Edison 2019 TBP OwnScore OPR vs Rank.png = SupportingData\Images\Detroit Edison 2019 TBP OwnScore OPR vs Rank.png
 		SupportingData\Images\Detroit Edison 2019 TBP Rule Comparison.PNG = SupportingData\Images\Detroit Edison 2019 TBP Rule Comparison.PNG
 		SupportingData\Images\Detroit Ochoa 2019 TBP Rule Comparison.PNG = SupportingData\Images\Detroit Ochoa 2019 TBP Rule Comparison.PNG
+		SupportingData\Images\Houston Franklin 2019 TBP Rule Comparison.PNG = SupportingData\Images\Houston Franklin 2019 TBP Rule Comparison.PNG
+		SupportingData\Images\Houston Jemison 2019 TBP Rule Comparison.PNG = SupportingData\Images\Houston Jemison 2019 TBP Rule Comparison.PNG
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PDF", "PDF", "{4FEABADA-B385-4EEF-8DA4-1A8D22422393}"
